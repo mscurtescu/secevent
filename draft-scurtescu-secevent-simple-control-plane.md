@@ -3,6 +3,7 @@ title: Simple Control Plane for SET Delivery
 abbrev: simple-control-plane
 docname: draft-scurtescu-secevent-simple-control-plane-00
 date: 2017-05-10
+category: info
 
 area: Security
 workgroup: secevent
