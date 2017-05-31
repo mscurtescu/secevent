@@ -32,7 +32,7 @@ normative:
 
 Security Event Token (SET) delivery requires event receivers to indicate
 to event transmitters the subjects about which they wish to receive
-events, and how they wish to them. This specification defines a REST
+events, and how they wish to them. This specification defines an HTTP 
 API for a basic control plane that event transmitters can implement and
 event receivers may use to manage the flow of events from one to the
 other.
