@@ -1,4 +1,5 @@
---- title: Control Plane for SET Delivery
+---
+title: Control Plane for SET Delivery
 abbrev: set-control-plane
 docname: draft-scurtescu-secevent-simple-control-plane-00
 date: 2017-05-31
