@@ -26,10 +26,14 @@ author:
     email: richanna@amazon.com
     
 normative:
-  RFC7159:
+  JSON: RFC7159
   RFC7519:
-  set-delivery:
-    title: <<TODO>>
+  SET:
+    title: Security Event Token (SET)
+    target: https://tools.ietf.org/html/draft-ietf-secevent-token-01
+  DELIVERY:
+    title: SET Token Delivery Using HTTP
+    target: https://github.com/independentid/Identity-Events/blob/master/draft-hunt-secevent-delivery.txt
 
 --- abstract
 
@@ -51,6 +55,19 @@ Notational Conventions {#conv}
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in {{!RFC2119}}.
+
+Definitions {#def}
+===========
+In addition to terms defined in [SET](#SET), this
+specification uses the following terms:
+
+{: vspace="0"}
+Subject Identifier Object
+: A JSON object containing a set of one or more claims about a subject that
+  when taken together uniquely identify that subject. This set of claims
+  SHOULD be declared as an acceptable way to identify subjects of SETs by
+  one or more specifications that profile [SET](#SET).
+
 
 Control Plane Resources {#resources}
 =======================
@@ -92,7 +109,7 @@ requests to modify the stream's configuration.
 
 delivery_methods
 : A JSON object containing a set of name/value pairs, where the name is a
-URI identifying a SET delivery method as defined in [SET Delivery](#set-delivery), and
+URI identifying a SET delivery method as defined in [DELIVERY](#DELIVERY), and
 the value is a JSON object whose name/value pairs contain the additional
 configuration parameters for that SET delivery method. The value object may
 be an empty JSON object (e.g. `{}`) if the SET delivery method does not have
@@ -104,7 +121,7 @@ merge docs.>>
 ### Reading a Stream's Configuration
 An event receiver gets the current configuration of a stream by making
 an HTTP GET request to the stream resource. On receiving a valid request
-the event transmitter responds with a 200 OK response containing a [JSON](#RFC7159)
+the event transmitter responds with a 200 OK response containing a {{!JSON}}
 representation of the stream's configuration in the body.
 
 The following is a non-normative example request to read a stream's
@@ -155,22 +172,15 @@ event transmitter may transmit events over the stream. Event receivers
 can manipulate this set to manage which subjects they may receive events
 about over the stream.
 
-As the nature of the subject of a SET is left up to profiling
-specifications to define, subject identifiers are out of scope for this
-specification. Profiling specifications MUST define one or more subject
-properties that a receiver can include in their requests in order to
-identify the subject the request pertains to. 
-
 ### Adding a Subject to a Stream
-When a receiver wants to signal to a transmitter that they wish to
-receive events about a particular subject over a stream, the receiver
-makes an HTTP POST request to the `/add-subjects` endpoint under the
-stream's resource, containing in the body a JSON object whose name/value
-pairs contain subject identifiers defined by a profiling specification. The
-transmitter MAY choose to ignore the request, for example if the subject has
-previously indicated to the transmitter that they do not want events to be
-transmitted to the receiver. On a successful response, the transmitter
-responds with an empty 200 OK response.
+When a receiver wants to signal to a transmitter that they wish to receive
+events about a particular subject over a stream, the receiver makes an HTTP
+POST request to the `/add-subjects` endpoint under the stream's resource,
+containing in the body a Subject Identifier Object identifying the subject
+to be added. The transmitter MAY choose to ignore the request, for example
+if the subject has previously indicated to the transmitter that they do not
+want events to be transmitted to the receiver. On a successful response, the
+transmitter responds with an empty 200 OK response.
 
 <<TODO: MUST transmitters indicate that they are ignoring the request?>>
 
@@ -205,10 +215,9 @@ Pragma: no-cache
 When a receiver wants to signal to a transmitter that the receiver no
 longer wishes to receive events about a subject over a stream, the
 receiver makes an HTTP POST request to the `/remove-subject` endpoint under
-the stream's resource, containing in the body a JSON object whose name/value
-pairs contain subject identifiers defined by a profiling specification. The
-On a successful response, the transmitter responds with a 204 No Content
-response.
+the stream's resource, containing in the body a Subject Identifier Object
+identifying the subject to be removed. On a successful response, the
+transmitter responds with a 204 No Content response.
 
 <<TODO: Errors>>
 
