@@ -177,12 +177,14 @@ When a receiver wants to signal to a transmitter that they wish to receive
 events about a particular subject over a stream, the receiver makes an HTTP
 POST request to the `/add-subjects` endpoint under the stream's resource,
 containing in the body a Subject Identifier Object identifying the subject
-to be added. The transmitter MAY choose to ignore the request, for example
-if the subject has previously indicated to the transmitter that they do not
-want events to be transmitted to the receiver. On a successful response, the
-transmitter responds with an empty 200 OK response.
+to be added. On a successful response, the transmitter responds with an
+empty 200 OK response.
 
-<<TODO: MUST transmitters indicate that they are ignoring the request?>>
+The transmitter MAY choose to silently ignore the request, for example if
+the subject has previously indicated to the transmitter that they do not
+want events to be transmitted to the receiver. In this case, the transmitter
+MUST return an empty 200 OK response, and MUST NOT indicate to the receiver
+that the request was ignored.
 
 <<TODO: Errors>>
 
