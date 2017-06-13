@@ -26,8 +26,10 @@ author:
     email: richanna@amazon.com
     
 normative:
- RFC7159:
- RFC7519:
+  RFC7159:
+  RFC7519:
+  set-delivery:
+    title: <<TODO>>
 
 --- abstract
 
@@ -52,9 +54,9 @@ document are to be interpreted as described in {{!RFC2119}}.
 
 Control Plane Resources {#resources}
 =======================
-Event receivers manage how they receive events and the subjects about
-which they want to receive events by making HTTP requests to resources
-that collectively make up the SET Control Plane.
+Event receivers manage how they receive events and the subjects about which
+they want to receive events by making HTTP requests to resources that
+collectively make up the SET Control Plane.
 
 Stream {#stream}
 ----------------
@@ -81,42 +83,23 @@ aud
   (JWT)](#RFC7519) that identifies the event receiver for the stream.
 
 events
-: OPTIONAL. An array of URIs identifying the set of events which the
-  transmitter may transmit over this stream. If omitted, transmitters
-  SHOULD make this set available to the receiver via some other means
-  (e.g. publishing it in online documentation). The value of this
-  property is dictated by the transmitter, and therefore it SHALL be
-  omitted by the receiver when making requests to modify the stream's
-  configuration.
+: OPTIONAL. An array of URIs identifying the set of events which MAY be
+delivered over the event stream. If omitted, transmitters SHOULD make this
+set available to the receiver via some other means (e.g. publishing it in
+online documentation). The value of this property is dictated by the
+transmitter, and therefore it SHALL be omitted by the receiver when making
+requests to modify the stream's configuration.
 
-transmission_method
-: A string indicating the mechanism by which the transmitter will
-  transmit events to the receiver. Allowed values are:
-  
-  {: vspace="0"}
-  HTTP_PUSH
-  : The transmitter will send events to the receiver via
-    HTTP POST requests to the stream's http_push_url.
+delivery_methods
+: A JSON object containing a set of name/value pairs, where the name is a
+URI identifying a SET delivery method as defined in [SET Delivery](#set-delivery), and
+the value is a JSON object whose name/value pairs contain the additional
+configuration parameters for that SET delivery method. The value object may
+be an empty JSON object (e.g. `{}`) if the SET delivery method does not have
+any configuration parameters.
 
-  HTTP_PULL
-  : The receiver will periodically make HTTP GET requests to
-    the stream's http_pull_url to get new events.
-  
-  <<TODO: (richanna) These should reference the distribution spec.>>\\
-  <<TODO: (richanna) Should these be UR\[ILN]s instead of strings I
-  made up?>>
-
-http_pull_url
-: OPTIONAL unless transmission_method is HTTP_PULL. The URL to which
-  the receiver will make requests in order to get events. The value of
-  this property is dictated by the transmitter, and therefore it SHALL
-  be omitted by the receiver when making requests to modify the stream's
-  configuration.
-
-http_push_url
-: OPTIONAL unless transmission_method is HTTP_PUSH. The URL to which
-  the transmitter will send events when transmitting events to the
-  receiver. 
+<<TODO: Update with actual SET delivery reference, or drop reference if we
+merge docs.>>
 
 ### Reading a Stream's Configuration
 An event receiver gets the current configuration of a stream by making
@@ -144,8 +127,14 @@ Pragma: no-cache
 
 {
   "aud": "http://www.example.com",
-  "transmission_method": "HTTP_PULL",
-  "http_push_url": "https://transmitter.example.com/events/risc",
+  "delivery_methods": {
+    "https://schemas.example.com/set/http-push": {
+      "url": "https://receiver.example.com/events/risc"
+    },
+    "https://schemas.example.com/set/http-pull": {
+      "url": "https://transmitter.example.com/events/risc"
+    }
+  },
   "events": [
     "https://schemas.openid.net/risc/event-type/account-at-risk",
     "https://schemas.openid.net/risc/event-type/account-deleted",
@@ -157,39 +146,6 @@ Pragma: no-cache
     "https://schemas.openid.net/risc/event-type/tokens-revoked"
   ]
 }
-~~~
-
-### Modifying a Stream's Configuration
-An event receiver modifies the configuration of an event stream by
-making an HTTP POST request to the stream's resource, with the desired
-changes expressed as a JSON object in the request body. On a successful
-response, the event transmitter responds with a 200 OK response
-containing the stream's modified configuration.
-
-The following is a non-normative example request:
-
-~~~
-POST /streams/risc HTTP/1.1
-Host: transmitter.example.com
-Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
-Content-Type: application/json; charset=UTF-8
-
-{
-  "aud": "http://www.example.com",
-  "transmission_method": "HTTP_PUSH",
-  "http_push_url": "https://receiver.example.com/event_receiver/risc",
-}
-
-~~~
-
-The following is a non-normative example response:
-
-~~~
-HTTP/1.1 200 OK
-Server: transmitter.example.com
-Cache-Control: no-store
-Pragma: no-cache
-
 ~~~
 
 Subjects {#subjects}
