@@ -161,57 +161,37 @@ specification. Profiling specifications MUST define one or more subject
 properties that a receiver can include in their requests in order to
 identify the subject the request pertains to. 
 
-<<TODO: richanna: I think this spec should go further and require
-standardized representations for subject identifiers, e.g. so subjects
-identified by phone number look the same in the control plane for
-profiling spec A and profiling spec B. I want second opinions before
-writing this up, though.>>
-
-Profiling specifications MAY define additional subject properties. Event
-transmitters MUST reject any request containing subject properties that
-it does not understand or that are undefined for the events that may be
-transmitted over the stream.
-
-In addition to properties defined in profiling specifications, all
-subjects have the following properties:
-
-{: vspace="0"}
-transmit_events
-: A boolean indicating whether or not the receiver wants to receive
-  events about the subject.
-
 ### Adding a Subject to a Stream
 When a receiver wants to signal to a transmitter that they wish to
 receive events about a particular subject over a stream, the receiver
-makes an HTTP POST request to the stream's `/subjects` resource. The
-transmitter MAY choose to ignore the request, for example if the subject
-has previously indicated to the transmitter that they do not want events
-to be transmitted to the receiver. On a successful response, the
-transmitter responds with an empty 200 OK response.
+makes an HTTP POST request to the `/add-subjects` endpoint under the
+stream's resource, containing in the body a JSON object whose name/value
+pairs contain subject identifiers defined by a profiling specification. The
+transmitter MAY choose to ignore the request, for example if the subject has
+previously indicated to the transmitter that they do not want events to be
+transmitted to the receiver. On a successful response, the transmitter
+responds with an empty 200 OK response.
 
 <<TODO: MUST transmitters indicate that they are ignoring the request?>>
 
 <<TODO: Errors>>
 
 The following is a non-normative example request to add a subject to a
-stream:
+stream, where the subject is identified by OpenID Connect iss and sub
+claims:
 
 ~~~
-POST /streams/risc/subjects HTTP/1.1
+POST /streams/risc/add-subject HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
 {
-  sub_type: "http://www.openid.net/events/sub_types/oidc",
-  sub: {
-    "iss": "http://transmitter.example.com",
-    "sub": "1234567"
-  },
-  "transmit_events": true
+  "iss": "http://account.example.com",
+  "sub": "1234567"
 }
 ~~~
 
-The following is a non-normative example response:
+The following is a non-normative example response to a successful request:
 
 ~~~
 HTTP/1.1 200 OK
@@ -224,33 +204,28 @@ Pragma: no-cache
 ### Removing a Subject
 When a receiver wants to signal to a transmitter that the receiver no
 longer wishes to receive events about a subject over a stream, the
-receiver makes an HTTP POST request to the stream's `/subjects`
-resource. On a successful response, the transmitter responds with a
-204 No Conten) response.
+receiver makes an HTTP POST request to the `/remove-subject` endpoint under
+the stream's resource, containing in the body a JSON object whose name/value
+pairs contain subject identifiers defined by a profiling specification. The
+On a successful response, the transmitter responds with a 204 No Content
+response.
 
 <<TODO: Errors>>
 
-The following is a non-normative example request to remove a subject
-from a stream:
+The following is a non-normative example request where the subject is
+identified by an email claim:
 
 ~~~
-POST /streams/risc/subjects HTTP/1.1
+POST /streams/risc/remove-subject HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
-Content-Type: application/json; charset=UTF-8
 
 {
-  sub_type: "http://www.openid.net/events/sub_types/oidc",
-  sub: {
-    "iss": "http://transmitter.example.com",
-    "sub": "1234567"
-  },
-  "receive_events": false
+  "email": "example.user@example.com"
 }
 ~~~
 
-The following is a non-normative example response to a successful
-response:
+The following is a non-normative example response to a successful request:
 
 ~~~
 HTTP/1.1 204 No Content
@@ -263,12 +238,12 @@ Pragma: no-cache
 Verification {#verify}
 ----------------------
 In some cases, the frequency of event transmission on a stream will be
-very low, making it difficult for an event receiver to tell the
-difference between expected behavior and event transmission failure due
-to a misconfigured stream. Event receivers can use a stream's
-`/verification` resource to request that a verification event be
-transmitted over the stream, allowing the receiver to confirm that the
-stream is configured correctly upon successful receipt of the event.
+very low, making it difficult for an event receiver to tell the difference
+between expected behavior and event transmission failure due to a
+misconfigured stream. Event receivers can use a stream's `/verification`
+resource to request that a verification event be transmitted over the
+stream, allowing the receiver to confirm that the stream is configured
+correctly upon successful receipt of the event.
 
 {: vspace="0"}
 state
