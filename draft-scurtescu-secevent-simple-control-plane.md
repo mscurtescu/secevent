@@ -1,5 +1,5 @@
 ---
-title: Control Plane for SET Delivery
+title: Management API for SET Event Streams
 abbrev: set-control-plane
 docname: draft-scurtescu-secevent-simple-control-plane-00
 date: 2017-05-31
@@ -31,9 +31,11 @@ normative:
   SET:
     title: Security Event Token (SET)
     target: https://tools.ietf.org/html/draft-ietf-secevent-token-01
+    # TODO: Update with real reference.
   DELIVERY:
     title: SET Token Delivery Using HTTP
     target: https://github.com/independentid/Identity-Events/blob/master/draft-hunt-secevent-delivery.txt
+    # TODO: Update with real reference.
 
 --- abstract
 
@@ -62,6 +64,22 @@ In addition to terms defined in [SET](#SET), this
 specification uses the following terms:
 
 {: vspace="0"}
+Event Stream
+: An Event Stream is a configured relationship between a single Event
+  Transmitter and a single Event Receiver, describing one or more methods by
+  which the Event Transmitter may deliver SETs to the Event Receiver. Event
+  Streams are unidirectional, with only one Event Transmitter and one Event
+  Receiver. Event Transmitters MAY support multiple Event Streams for a
+  single Event Receiver.
+
+Event Stream Management Endpoint
+: A URL hosted by the transmitter, which serves as the base for the stream
+  management API for a stream. An Event Transmitter MAY use a single
+  Management Endpoint for multiple streams, provided that the transmitter
+  has some mechanism through which they can identify the applicable stream
+  for any given request, e.g. from authentication credentials. The
+  definition of such mechanisms is outside the scope of this specification.
+
 Subject Identifier Object
 : A JSON object containing a set of one or more claims about a subject that
   when taken together uniquely identify that subject. This set of claims
@@ -69,62 +87,44 @@ Subject Identifier Object
   one or more specifications that profile [SET](#SET).
 
 
-Control Plane Resources {#resources}
+Event Stream Management {#management}
 =======================
-Event receivers manage how they receive events and the subjects about which
-they want to receive events by making HTTP requests to resources that
-collectively make up the SET Control Plane.
+Event Receivers manage how they receive events, and the subjects about which
+they want to receive events over an Event Stream by making HTTP requests to
+endpoints under the stream's Event Stream Management Endpoint. These
+endpoints collectively make up the Event Stream Management API.
 
-Stream {#stream}
-----------------
-A stream represents a configured relationship between a single
-event transmitter and a single event receiver, and describes which
-events the transmitter may transmit to the receiver and how the
-receiver may receive those events. A stream's event transmitter
-transmits events over the stream to the stream's event receiver, making
-the events available to the event receiver in an agreed upon way as
-described by the stream's configuration.
-
-Transmitters MAY support multiple streams for the same receiver.
-Transmitters MAY also assign distinct URLs for different streams, and/or
-provide a single URL for multiple streams, provided that the transmitter
-has some mechanism through which they can identify the receiver and
-stream, e.g. from authentication credentials. The definition of such
-mechanisms is outside the scope of this specification.
-
-Event streams have the following properties:
+Stream Configuration {#stream}
+--------------------
+An Event Stream's configuration is represented as a JSON object with the
+following properties:
 
 {: vspace="0"}
 aud
 : A string containing an audience claim as defined in [JSON Web Token
-  (JWT)](#RFC7519) that identifies the event receiver for the stream.
+  (JWT)](#RFC7519) that identifies the Event Receiver for the Event Stream.
 
 events
 : OPTIONAL. An array of URIs identifying the set of events which MAY be
-delivered over the event stream. If omitted, transmitters SHOULD make this
-set available to the receiver via some other means (e.g. publishing it in
-online documentation). The value of this property is dictated by the
-transmitter, and therefore it SHALL be omitted by the receiver when making
-requests to modify the stream's configuration.
+delivered over the Event Stream. If omitted, Event Transmitters SHOULD make
+this set available to the Event Receiver via some other means (e.g.
+publishing it in online documentation).
 
 delivery_methods
 : A JSON object containing a set of name/value pairs, where the name is a
-URI identifying a SET delivery method as defined in [DELIVERY](#DELIVERY), and
-the value is a JSON object whose name/value pairs contain the additional
+URI identifying a SET delivery method as defined in [DELIVERY](#DELIVERY), and the
+value is a JSON object whose name/value pairs contain the additional
 configuration parameters for that SET delivery method. The value object may
 be an empty JSON object (e.g. `{}`) if the SET delivery method does not have
 any configuration parameters.
 
-<<TODO: Update with actual SET delivery reference, or drop reference if we
-merge docs.>>
-
 ### Reading a Stream's Configuration
-An event receiver gets the current configuration of a stream by making
-an HTTP GET request to the stream resource. On receiving a valid request
-the event transmitter responds with a 200 OK response containing a {{!JSON}}
-representation of the stream's configuration in the body.
+An Event Receiver gets the current configuration of a stream by making an
+HTTP GET request to the stream's Management Endpoint. On receiving a valid
+request the Event Transmitter responds with a 200 OK response containing a
+{{!JSON}} representation of the stream's configuration in the body.
 
-The following is a non-normative example request to read a stream's
+The following is a non-normative example request to read an Event Stream's
 configuration:
 
 ~~~
@@ -167,24 +167,22 @@ Pragma: no-cache
 
 Subjects {#subjects}
 --------------------
-Each stream has a set of subjects, entities or objects about which the
-event transmitter may transmit events over the stream. Event receivers
-can manipulate this set to manage which subjects they may receive events
-about over the stream.
+An Event Receiver can indicate to an Event Transmitter whether or not the
+receiver wants to receive events about a particular subject by "adding" or
+"removing" that subject to the Event Stream, respectively.
 
 ### Adding a Subject to a Stream
-When a receiver wants to signal to a transmitter that they wish to receive
-events about a particular subject over a stream, the receiver makes an HTTP
-POST request to the `/add-subjects` endpoint under the stream's resource,
-containing in the body a Subject Identifier Object identifying the subject
-to be added. On a successful response, the transmitter responds with an
-empty 200 OK response.
+To add a subject to an Event Stream, the Event Receiver makes an HTTP POST
+request to the `/add-subjects` endpoint under the stream's Management
+Endpoint, containing in the body a Subject Identifier Object identifying the
+subject to be added. On a successful response, the Event Transmitter
+responds with an empty 200 OK response.
 
-The transmitter MAY choose to silently ignore the request, for example if
-the subject has previously indicated to the transmitter that they do not
-want events to be transmitted to the receiver. In this case, the transmitter
-MUST return an empty 200 OK response, and MUST NOT indicate to the receiver
-that the request was ignored.
+The Event Transmitter MAY choose to silently ignore the request, for example
+if the subject has previously indicated to the transmitter that they do not
+want events to be transmitted to the Event Receiver. In this case, the
+transmitter MUST return an empty 200 OK response, and MUST NOT indicate to
+the receiver that the request was ignored.
 
 <<TODO: Errors>>
 
@@ -214,12 +212,11 @@ Pragma: no-cache
 ~~~
 
 ### Removing a Subject
-When a receiver wants to signal to a transmitter that the receiver no
-longer wishes to receive events about a subject over a stream, the
-receiver makes an HTTP POST request to the `/remove-subject` endpoint under
-the stream's resource, containing in the body a Subject Identifier Object
-identifying the subject to be removed. On a successful response, the
-transmitter responds with a 204 No Content response.
+To remove a subject from an Event Stream, the Event Receiver makes an HTTP
+POST request to the `/remove-subject` endpoint under the stream's Management
+Endpoint, containing in the body a Subject Identifier Object identifying the
+subject to be removed. On a successful response, the Event Transmitter
+responds with a 204 No Content response.
 
 <<TODO: Errors>>
 
@@ -248,40 +245,41 @@ Pragma: no-cache
 
 Verification {#verify}
 ----------------------
-In some cases, the frequency of event transmission on a stream will be
-very low, making it difficult for an event receiver to tell the difference
-between expected behavior and event transmission failure due to a
-misconfigured stream. Event receivers can use a stream's `/verification`
-resource to request that a verification event be transmitted over the
-stream, allowing the receiver to confirm that the stream is configured
-correctly upon successful receipt of the event.
+In some cases, the frequency of event transmission on an Event Stream will
+be very low, making it difficult for an Event Receiver to tell the
+difference between expected behavior and event transmission failure due to a
+misconfigured stream. Event Receivers can request that a verification event
+be transmitted over the Event Stream, allowing the receiver to confirm that
+the stream is configured correctly upon successful receipt of the event.
+
+Verification requests have the following properties:
 
 {: vspace="0"}
 state
-: OPTIONAL. An arbitrary string that the transmitter MUST echo back to
-  the receiver in the verification event's payload. Receivers MAY use
-  the value of this parameter to correlate a verification event with a
-  verification request.
+: OPTIONAL. An arbitrary string that the Event Transmitter MUST echo back to
+  the Event Receiver in the verification event's payload. Event Receivers
+  MAY use the value of this parameter to correlate a verification event with
+  a verification request.
 
 ### Triggering a Verification Event.
-To request that a verification event be sent over a stream, the event
-receiver makes an HTTP POST request to the stream's `/verification`
-subresource, with a JSON object containing the parameters of the
-verification request, if any. On a successful request, the event
-transmitter responds with an empty 204 No Content response.
+To request that a verification event be sent over an Event Stream, the Event
+Receiver makes an HTTP POST request to the `/verification` endpoint under
+the stream's Management Endpoint, with a JSON object containing the
+parameters of the verification request, if any. On a successful request, the
+event transmitter responds with an empty 204 No Content response.
 
-A successful response from a POST to the `/verification` subresource
-does not indicate that the verification event was transmitted
-successfully, only that the transmitter has transmitted the event or
-will do so at some point in the future. Transmitters MAY transmit the
-event via an asynchronous process, and SHOULD publish an SLA for
-verification event transmission times. Receivers MUST NOT depend on the
-verification event being transmitted synchonrously with their request.
+A successful response from a POST to the `/verification` endpoint does not
+indicate that the verification event was transmitted successfully, only that
+the Event Transmitter has transmitted the event or will do so at some point
+in the future. Event Transmitters MAY transmit the event via an asynchronous
+process, and SHOULD publish an SLA for verification event transmission
+times. Event Receivers MUST NOT depend on the verification event being
+transmitted synchonrously with their request.
 
 <<TODO: Errors>>
 
-The following is a non-normative example request to trigger a
-verification event:
+The following is a non-normative example request to trigger a verification
+event:
 
 ~~~
 POST /streams/risc/verification HTTP/1.1
@@ -294,8 +292,7 @@ Content-Type: application/json; charset=UTF-8
 }
 ~~~
 
-The following is a non-normative example response to a successful
-response:
+The following is a non-normative example response to a successful request:
 
 ~~~
 HTTP/1.1 204 No Content
