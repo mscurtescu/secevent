@@ -73,12 +73,25 @@ Event Stream
   single Event Receiver.
 
 Event Stream Management Endpoint
-: A URL hosted by the transmitter, which serves as the base for the stream
+: A URL hosted by the transmitter, which serves as the stream
   management API for a stream. An Event Transmitter MAY use a single
   Management Endpoint for multiple streams, provided that the transmitter
   has some mechanism through which they can identify the applicable stream
   for any given request, e.g. from authentication credentials. The
   definition of such mechanisms is outside the scope of this specification.
+
+Add Subject Endpoint
+: A URL hosted by the transmitter used to add subjects to an Event Stream.
+
+Remove Subject Endpoint
+: A URL hosted by the transmitter used to remove subjects from an Event Stream.
+
+Verification Endpoint
+: A URL hosted by the transmitter used to trigger a Verification Event to be
+  sent to the receiver.
+
+Event Stream Management API
+: The API collectively made up by the four endpoints defined above.
 
 Subject Identifier Object
 : A JSON object containing a set of one or more claims about a subject that
@@ -86,13 +99,16 @@ Subject Identifier Object
   SHOULD be declared as an acceptable way to identify subjects of SETs by
   one or more specifications that profile [SET](#SET).
 
+Verificatio Event
+: A special evet type for testing Event Streams. Receivers can request
+  such an event through the Verification Endpoint. Transmitters can
+  periodically send these events to ensure the connection is alive.
 
 Event Stream Management {#management}
 =======================
 Event Receivers manage how they receive events, and the subjects about which
 they want to receive events over an Event Stream by making HTTP requests to
-endpoints under the stream's Event Stream Management Endpoint. These
-endpoints collectively make up the Event Stream Management API.
+endpoints in the Event Stream Management API.
 
 Stream Configuration {#stream}
 --------------------
@@ -118,7 +134,7 @@ defined in [DELIVERY](#DELIVERY).
 
 ### Reading a Stream's Configuration
 An Event Receiver gets the current configuration of a stream by making an
-HTTP GET request to the stream's Management Endpoint. On receiving a valid
+HTTP GET request to the Event Stream Management Endpoint. On receiving a valid
 request the Event Transmitter responds with a 200 OK response containing a
 {{!JSON}} representation of the stream's configuration in the body.
 
@@ -126,7 +142,7 @@ The following is a non-normative example request to read an Event Stream's
 configuration:
 
 ~~~
-GET /streams/risc HTTP/1.1
+GET /set/stream HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
@@ -144,7 +160,7 @@ Pragma: no-cache
   "aud": "http://www.example.com",
   "delivery": {
     "delivery_method": "https://schemas.example.com/set/http-push",
-    "url": "https://receiver.example.com/events/risc"
+    "url": "https://receiver.example.com/events"
   },
   "events": [
     "https://schemas.openid.net/risc/event-type/account-at-risk",
@@ -167,10 +183,9 @@ receiver wants to receive events about a particular subject by "adding" or
 
 ### Adding a Subject to a Stream
 To add a subject to an Event Stream, the Event Receiver makes an HTTP POST
-request to the `/add-subjects` endpoint under the stream's Management
-Endpoint, containing in the body a Subject Identifier Object identifying the
-subject to be added. On a successful response, the Event Transmitter
-responds with an empty 200 OK response.
+request to the Add Subject Endpoint, containing in the body a Subject
+Identifier Object identifying the subject to be added. On a successful
+response, the Event Transmitter responds with an empty 200 OK response.
 
 The Event Transmitter MAY choose to silently ignore the request, for example
 if the subject has previously indicated to the transmitter that they do not
@@ -185,7 +200,7 @@ stream, where the subject is identified by OpenID Connect iss and sub
 claims:
 
 ~~~
-POST /streams/risc/add-subject HTTP/1.1
+POST /set/subjects:add HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
@@ -207,10 +222,9 @@ Pragma: no-cache
 
 ### Removing a Subject
 To remove a subject from an Event Stream, the Event Receiver makes an HTTP
-POST request to the `/remove-subject` endpoint under the stream's Management
-Endpoint, containing in the body a Subject Identifier Object identifying the
-subject to be removed. On a successful response, the Event Transmitter
-responds with a 204 No Content response.
+POST request to the Remove Subject Endpoint, containing in the body a Subject
+Identifier Object identifying the subject to be removed. On a successful
+response, the Event Transmitter responds with a 204 No Content response.
 
 <<TODO: Errors>>
 
@@ -218,7 +232,7 @@ The following is a non-normative example request where the subject is
 identified by an email claim:
 
 ~~~
-POST /streams/risc/remove-subject HTTP/1.1
+POST /set/subjects:remove HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
@@ -257,12 +271,12 @@ state
 
 ### Triggering a Verification Event.
 To request that a verification event be sent over an Event Stream, the Event
-Receiver makes an HTTP POST request to the `/verification` endpoint under
-the stream's Management Endpoint, with a JSON object containing the
-parameters of the verification request, if any. On a successful request, the
-event transmitter responds with an empty 204 No Content response.
+Receiver makes an HTTP POST request to the Verification Endpoint, with a JSON
+object containing the parameters of the verification request, if any. On a
+successful request, the event transmitter responds with an empty 204 No Content
+response.
 
-A successful response from a POST to the `/verification` endpoint does not
+A successful response from a POST to the Verification` Endpoint does not
 indicate that the verification event was transmitted successfully, only that
 the Event Transmitter has transmitted the event or will do so at some point
 in the future. Event Transmitters MAY transmit the event via an asynchronous
@@ -276,7 +290,7 @@ The following is a non-normative example request to trigger a verification
 event:
 
 ~~~
-POST /streams/risc/verification HTTP/1.1
+POST /set/verify HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 Content-Type: application/json; charset=UTF-8
