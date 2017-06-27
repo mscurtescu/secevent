@@ -319,7 +319,7 @@ Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 Content-Type: application/json; charset=UTF-8
 
 {
-  state: "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo="
+  "state": "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo="
 }
 ~~~
 
@@ -330,6 +330,24 @@ HTTP/1.1 204 No Content
 Server: transmitter.example.com
 Cache-Control: no-store
 Pragma: no-cache
+
+~~~
+
+And the following is a non-normative example of a verification event sent to
+the Event Receiver as a result of the above request:
+
+~~~
+{
+  "jti": "123456",
+  "iss": "https://transmitter.example.com",
+  "aud": "receiver.example.com",
+  "iat": "1493856000",
+  "events": [
+    "urn:ietf:params:secevent:event-type:core:verify" : {
+      "state": "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo=",
+    },
+  ],
+}
 
 ~~~
 
