@@ -41,7 +41,7 @@ normative:
 
 Security Event Token (SET) delivery requires event receivers to indicate
 to event transmitters the subjects about which they wish to receive
-events, and how they wish to them. This specification defines an HTTP 
+events, and how they wish to receive them. This specification defines an HTTP 
 API for a basic control plane that event transmitters can implement and
 event receivers may use to manage the flow of events from one to the
 other.
@@ -69,7 +69,7 @@ Event Stream
   Transmitter and a single Event Receiver, describing one or more methods by
   which the Event Transmitter may deliver SETs to the Event Receiver. Event
   Streams are unidirectional, with only one Event Transmitter and one Event
-  Receiver. Event Transmitters MAY support multiple Event Streams for a
+  Receiver. Event Transmitters support only one Event Streams for a
   single Event Receiver.
 
 Event Stream Management Endpoint
@@ -110,13 +110,11 @@ delivered over the Event Stream. If omitted, Event Transmitters SHOULD make
 this set available to the Event Receiver via some other means (e.g.
 publishing it in online documentation).
 
-delivery_methods
-: A JSON object containing a set of name/value pairs, where the name is a
-URI identifying a SET delivery method as defined in [DELIVERY](#DELIVERY), and the
-value is a JSON object whose name/value pairs contain the additional
-configuration parameters for that SET delivery method. The value object may
-be an empty JSON object (e.g. `{}`) if the SET delivery method does not have
-any configuration parameters.
+delivery
+: A JSON object containing a set of name/value pairs specifying configuration
+parameters for the SET delivery method. The actual delivery method is
+identified by the special key "delivery_method" with the value being a URI as
+defined in [DELIVERY](#DELIVERY).
 
 ### Reading a Stream's Configuration
 An Event Receiver gets the current configuration of a stream by making an
@@ -144,13 +142,9 @@ Pragma: no-cache
 
 {
   "aud": "http://www.example.com",
-  "delivery_methods": {
-    "https://schemas.example.com/set/http-push": {
-      "url": "https://receiver.example.com/events/risc"
-    },
-    "https://schemas.example.com/set/http-pull": {
-      "url": "https://transmitter.example.com/events/risc"
-    }
+  "delivery": {
+    "delivery_method": "https://schemas.example.com/set/http-push",
+    "url": "https://receiver.example.com/events/risc"
   },
   "events": [
     "https://schemas.openid.net/risc/event-type/account-at-risk",
