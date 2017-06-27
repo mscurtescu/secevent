@@ -214,8 +214,7 @@ Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
 {
-  "iss": "http://account.example.com",
-  "sub": "1234567"
+  "email": "example.user@example.com"
 }
 ~~~
 
@@ -255,7 +254,7 @@ Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
 {
-  "email": "example.user@example.com"
+  "phone_number": "123-456-7890"
 }
 ~~~
 
