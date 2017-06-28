@@ -168,8 +168,8 @@ configuration:
 GET /set/stream HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
-
 ~~~
+{: #figstatusreq title="Example: Stream Status Request"}
 
 The following is a non-normative example response:
 
@@ -197,6 +197,7 @@ Pragma: no-cache
   ]
 }
 ~~~
+{: #figstatusresp title="Example: Stream Status Response"}
 
 Subjects {#subjects}
 --------------------
@@ -240,6 +241,7 @@ Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
   "email": "example.user@example.com"
 }
 ~~~
+{: #figaddreq title="Example: Add Subject Request"}
 
 The following is a non-normative example response to a successful request:
 
@@ -248,8 +250,8 @@ HTTP/1.1 200 OK
 Server: transmitter.example.com
 Cache-Control: no-store
 Pragma: no-cache
-
 ~~~
+{: #figaddresp title="Example: Add Subject Response"}
 
 ### Removing a Subject
 To remove a subject from an Event Stream, the Event Receiver makes an HTTP
@@ -280,6 +282,7 @@ Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
   "phone_number": "123-456-7890"
 }
 ~~~
+{: #figremovereq title="Example: Remove Subject Request"}
 
 The following is a non-normative example response to a successful request:
 
@@ -288,8 +291,8 @@ HTTP/1.1 204 No Content
 Server: transmitter.example.com
 Cache-Control: no-store
 Pragma: no-cache
-
 ~~~
+{: #figremoveresp title="Example: Remove Subject Response"}
 
 Verification {#verify}
 ----------------------
@@ -345,6 +348,7 @@ Content-Type: application/json; charset=UTF-8
   "state": "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo="
 }
 ~~~
+{: #figverifyreq title="Example: Trigger Verification Request"}
 
 The following is a non-normative example response to a successful request:
 
@@ -353,8 +357,8 @@ HTTP/1.1 204 No Content
 Server: transmitter.example.com
 Cache-Control: no-store
 Pragma: no-cache
-
 ~~~
+{: #figverifyresp title="Example: Trigger Verification Response"}
 
 And the following is a non-normative example of a verification event sent to
 the Event Receiver as a result of the above request:
@@ -371,8 +375,8 @@ the Event Receiver as a result of the above request:
     },
   ],
 }
-
 ~~~
+{: #figverifyset title="Example: Verification SET"}
 
 --- back
 
