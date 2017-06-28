@@ -219,14 +219,14 @@ the receiver that the request was ignored.
 
 Errors are signaled with HTTP staus codes as follows:
 
-* 400 - if the request body cannot be parsed or of the request is otherwise
-  invalid
-* 401 - if authorization failed or it is missing
-* 403 - if the Event Receiver is not allowed to add this particular subject
-* 404 - if the subject is not recognized by the Event Transmitter, the Event
-  Transmitter may chose to stay silent in this case and responde with 200
-* 429 - if the Event Receiver is sending too many requests in a gvien amount
-  of time
+| Code | Description |
+|------+-------------|
+| 400  | if the request body cannot be parsed or if the request is otherwise invalid |
+| 401  | if authorization failed or it is missing |
+| 403  | if the Event Receiver is not allowed to add this particular subject |
+| 404  | if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and responde with 200 |
+| 429  | if the Event Receiver is sending too many requests in a gvien amount of time |
+{: #tabadderr title="Add Subject Errors"}
 
 The following is a non-normative example request to add a subject to a
 stream, where the subject is identified by OpenID Connect iss and sub
@@ -261,14 +261,14 @@ response, the Event Transmitter responds with a 204 No Content response.
 
 Errors are signaled with HTTP staus codes as follows:
 
-* 400 - if the request body cannot be parsed or of the request is otherwise
-  invalid
-* 401 - if authorization failed or it is missing
-* 403 - if the Event Receiver is not allowed to remove this particular subject
-* 404 - if the subject is not recognized by the Event Transmitter, the Event
-  Transmitter may chose to stay silent in this case and responde with 204
-* 429 - if the Event Receiver is sending too many requests in a gvien amount
-  of time
+| Code | Description |
+|------+-------------|
+| 400  | if the request body cannot be parsed or if the request is otherwise invalid |
+| 401  | if authorization failed or it is missing |
+| 403  | if the Event Receiver is not allowed to remove this particular subject |
+| 404  | if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and responde with 204 |
+| 429  | if the Event Receiver is sending too many requests in a gvien amount of time |
+{: #tabremoveerr title="Remove Subject Errors"}
 
 The following is a non-normative example request where the subject is
 identified by an email claim:
@@ -329,11 +329,12 @@ transmitted synchonrously with their request.
 
 Errors are signaled with HTTP staus codes as follows:
 
-* 400 - if the request body cannot be parsed or of the request is otherwise
-  invalid
-* 401 - if authorization failed or it is missing
-* 429 - if the Event Receiver is sending too many requests in a gvien amount
-  of time
+| Code | Description |
+|------+-------------|
+| 400  | if the request body cannot be parsed or if the request is otherwise invalid |
+| 401  | if authorization failed or it is missing |
+| 429  | if the Event Receiver is sending too many requests in a gvien amount of time |
+{: #taberifyerr title="Verification Errors"}
 
 The following is a non-normative example request to trigger a verification
 event:
