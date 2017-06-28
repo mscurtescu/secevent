@@ -57,16 +57,16 @@ add and remove subjects and to trigger verification.
 ~~~
 +------------+                +------------+
 |            | Stream Status  |            |
-| Event      &lt;----------------+ Event      |
+| Event      <----------------+ Event      |
 | Stream     |                | Receiver   |
 | Management | Add Subject    |            |
-| API        &lt;----------------+            |
+| API        <----------------+            |
 |            |                |            |
 |            | Remove Subject |            |
-|            &lt;----------------+            |
+|            <----------------+            |
 |            |                |            |
 |            | Verification   |            |
-|            &lt;----------------+            |
+|            <----------------+            |
 |            |                |            |
 +------------+                +------------+
 ~~~
