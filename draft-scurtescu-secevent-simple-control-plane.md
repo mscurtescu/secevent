@@ -50,7 +50,30 @@ other.
 
 Introduction {#intro}
 ============
-<<TODO>>
+This specification defines an HTTP API to be implemented by Event Transmitters
+and that can be used by Event Receivers to query the Event Stream status, to
+add and remove subjects and to trigger verification.
+
+~~~
++------------+                +------------+
+|            | Stream Status  |            |
+| Event      &lt;----------------+ Event      |
+| Stream     |                | Receiver   |
+| Management | Add Subject    |            |
+| API        &lt;----------------+            |
+|            |                |            |
+|            | Remove Subject |            |
+|            &lt;----------------+            |
+|            |                |            |
+|            | Verification   |            |
+|            &lt;----------------+            |
+|            |                |            |
++------------+                +------------+
+~~~
+{: #figintro title="Event Stream Management API"}
+
+This spec does not define how events are delivered or what the structure of the
+events is and is out of scope for this specification.
 
 Notational Conventions {#conv}
 ======================
