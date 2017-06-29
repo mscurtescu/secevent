@@ -72,8 +72,8 @@ add and remove subjects and to trigger verification.
 ~~~
 {: #figintro title="Event Stream Management API"}
 
-This spec does not define how events are delivered or what the structure of the
-events is and is out of scope for this specification.
+How events are delivered and the structure of events are not in scope for this
+specification.
 
 Notational Conventions {#conv}
 ======================
@@ -96,7 +96,7 @@ Event Stream
   single Event Receiver.
 
 Event Stream Management Endpoint
-: A URL hosted by the transmitter, which serves as the stream
+: A URL hosted by the transmitter; it serves as the stream
   management API for a stream. An Event Transmitter MAY use a single
   Management Endpoint for multiple streams, provided that the transmitter
   has some mechanism through which they can identify the applicable stream
@@ -122,8 +122,8 @@ Subject Identifier Object
   SHOULD be declared as an acceptable way to identify subjects of SETs by
   one or more specifications that profile [SET](#SET).
 
-Verificatio Event
-: A special evet type for testing Event Streams. Receivers can request
+Verification Event
+: A special event type for testing Event Streams. Receivers can request
   such an event through the Verification Endpoint. Transmitters can
   periodically send these events to ensure the connection is alive.
 
@@ -229,8 +229,7 @@ Errors are signaled with HTTP staus codes as follows:
 {: #tabadderr title="Add Subject Errors"}
 
 The following is a non-normative example request to add a subject to a
-stream, where the subject is identified by OpenID Connect iss and sub
-claims:
+stream, where the subject is identified by an OpenID Connect email claim:
 
 ~~~
 POST /set/subjects:add HTTP/1.1
@@ -271,7 +270,7 @@ Errors are signaled with HTTP staus codes as follows:
 {: #tabremoveerr title="Remove Subject Errors"}
 
 The following is a non-normative example request where the subject is
-identified by an email claim:
+identified by a phone_number claim:
 
 ~~~
 POST /set/subjects:remove HTTP/1.1
@@ -319,13 +318,13 @@ object containing the parameters of the verification request, if any. On a
 successful request, the event transmitter responds with an empty 204 No Content
 response.
 
-A successful response from a POST to the Verification` Endpoint does not
+A successful response from a POST to the Verification Endpoint does not
 indicate that the verification event was transmitted successfully, only that
 the Event Transmitter has transmitted the event or will do so at some point
 in the future. Event Transmitters MAY transmit the event via an asynchronous
 process, and SHOULD publish an SLA for verification event transmission
 times. Event Receivers MUST NOT depend on the verification event being
-transmitted synchonrously with their request.
+transmitted synchronously with their request.
 
 Errors are signaled with HTTP staus codes as follows:
 
