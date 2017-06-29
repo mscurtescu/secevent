@@ -1,7 +1,7 @@
 ---
-title: Security Events Use Cases
-docname: draft-scurtescu-secevent-use-cases-00
-date: 2017-05-31
+title: Security Events RISC Use Cases
+docname: draft-scurtescu-secevent-risc-use-cases-00
+date: 2017-06-29
 category: info
 
 area: Security
@@ -17,15 +17,10 @@ author:
     name: Marius Scurtescu
     organization: Google
     email: mscurtescu@google.com
- -
-    ins: P. Hunt
-    name: Phil Hunt
-    organization: Oracle Corporation
-    email: phil.hunt@yahoo.com
     
 --- abstract
 
-This document describes the use cases for security events and helps with
+This document describes the RISC use cases for security events and helps with
 defining the requirements for token format and event distribution.
 
 
@@ -47,8 +42,8 @@ http://openid.net/wg/risc/
 http://www.simplecloud.info/
 
 
-RISC Use Cases {#risc}
-==============
+Use Cases {#use-cases}
+=========
 
 Explicit IdP to RP {#explicit-idp-to-rp}
 ------------------
@@ -158,10 +153,6 @@ On-Premise RP {#on-premise-rp}
 The RP (receiver) is behind a firewall and cannot be reached through HTTP. The
 only way to deliver events is if the RP periodically polls an endpoint provided
 by the transmitter. 
-
-
-SCIM Use Cases {#scim}
-==============
 
 --- back
 
