@@ -141,18 +141,19 @@ of RP)
 Security as a Service {#secaas}
 ---------------------
 
-Similar to IdaaS described in previous estion, but the service provider has its
-own set of credentials different from the credentials and RP is using. The SP
-cannot impersonate the RP at IdP. The IdP must define delegation rules and allow
-the SP to make requests on behalf of the RP.
+Similar to IdaaS described in previous section, but the service provider has its
+own set of credentials different from the credentials that an RP is using. The
+SP cannot impersonate the RP at IdP. The IdP must define delegation rules and
+allow the SP to make requests on behalf of the RP.
 
 
 On-Premise RP {#on-premise-rp}
 -------------
 
-The RP (receiver) is behind a firewall and cannot be reached through HTTP. The
-only way to deliver events is if the RP periodically polls an endpoint provided
-by the transmitter. 
+The RP (receiver) is behind a firewall and cannot be reached through HTTP. 
+
+The only way to deliver events is by periodicall polls done by the receiver to
+an endpoint provided by the transmitter.
 
 --- back
 
