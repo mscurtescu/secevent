@@ -121,8 +121,55 @@ publishing it in online documentation).</t>
 parameters for the SET delivery method. The actual delivery method is
 identified by the special key “delivery_method” with the value being a URI as
 defined in <xref target="DELIVERY"></xref>.</t>
+  <t hangText='status'><vspace blankLines='0'/>
+  A string indicating the current status of the event stream. It MUST have one 
+of the following values:
+
+      <list style="hanging">
+        <t hangText='enabled'><vspace blankLines='0'/>
+        The transmitter will transmit events over the stream, according to the
+stream’s configured delivery method.</t>
+        <t hangText='paused'><vspace blankLines='0'/>
+        The transmitter will not transmit events over the stream. The transmitter
+will hold any events it would have transmitted while paused, and will
+transmit them when the stream’s status becomes “enabled”.</t>
+        <t hangText='disabled'><vspace blankLines='0'/>
+        The transmitter will not transmit events over the stream, and will not
+hold any events for later transmission.</t>
+      </list>
+  </t>
 </list></t>
 
+<section anchor="checking-a-streams-status" title="Checking a Stream’s Status">
+<t>An Event Receiver checks the current status of an event stream by making an
+HTTP GET request to the stream’s status endpoint. On receiving a valid request
+the Event Transmitter responds with a 200 OK response containing a <xref target="JSON"/>
+object with a single attribute “status”, whose string value is the value of
+the stream’s status.</t>
+
+<t>The following is a non-normative example request to check an event stream’s
+status:</t>
+
+<figure title="Example: Check Stream Status Request" anchor="figstatusreq"><artwork><![CDATA[
+GET /set/stream/status HTTP/1.1
+Host: transmitter.example.com
+Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
+]]></artwork></figure>
+
+<t>The following is a non-normative example response:</t>
+
+<figure title="Example: Check Stream Status Response" anchor="figstatusresp"><artwork><![CDATA[
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  "status": "enabled"
+}
+]]></artwork></figure>
+
+</section>
 <section anchor="reading-a-streams-configuration" title="Reading a Stream’s Configuration">
 <t>An Event Receiver gets the current configuration of a stream by making an
 HTTP GET request to the configuration endpoint. On receiving a valid request
@@ -132,7 +179,7 @@ representation of the stream’s configuration in the body.</t>
 <t>The following is a non-normative example request to read an Event Stream’s
 configuration:</t>
 
-<figure title="Example: Stream Status Request" anchor="figstatusreq"><artwork><![CDATA[
+<figure title="Example: Read Stream Configuration Request" anchor="figconfigreq"><artwork><![CDATA[
 GET /set/stream HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
@@ -140,7 +187,7 @@ Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
 <t>The following is a non-normative example response:</t>
 
-<figure title="Example: Stream Status Response" anchor="figstatusresp"><artwork><![CDATA[
+<figure title="Example: Read Stream Configuration Response" anchor="figconfigresp"><artwork><![CDATA[
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=UTF-8
 Cache-Control: no-store
@@ -440,87 +487,94 @@ the Event Receiver as a result of the above request:</t>
   </back>
 
 <!-- ##markdown-source:
-H4sIAKiXcFkAA+1aa3PbNhb9jl+BlT80nViS7TzacDczdWM3cTeJU1tON9vJ
-ZCASktiQhEqAdtTY/e17Lh4USdFOstnszD40E0cS8bjPcw8uNBwOmUlNJiP+
-TBRiLnNZGL7/4ojPVMlPDyf88Jy+OTWlFLlmYjot5XnEtTTDWBWmVNlwmYlC
-skTFhcixTlKKmRnquCqNxN+hlrGkNYY6zZeZbE8b7uywRBhM29vZ/Wa4c3+4
-94DF+GKuylXE02KmWLosI27KSpu9nZ0HO3uMCQgT8VOJPVKzYheqfDsvVbUk
-udxm7K1c4esk4keFkWUBcQ9ILsa0EUXyRmSqwKYrqdkyjfgvRsXbXKsSas40
-3q1yevMaW1VmocqI8SHjeKWFhqVG/DSoZ791ij8TZVrpziNVzkWR/i5MqoqI
-P1Zqnkn7QOYizSKe14b6bm4fjmKVt3bbH/HvRfw2F0Vjr/2iEFOZZbL1rL3Z
-fi5+V0VzszKNFwIzvxP2kdsKL1aoMsescwlF+Y+nx88jfvLDo2927z3AZ3p3
-b/cBPUJARHaGj5ngAh8lE/VWFvwWRn3tRolyLk3EF8YsdTQeG6UyPUqlmY0g
-6nhh8mzswoW+W0eKoXWGO7t2kS0+OT44jvjZkgKFX6RmweH/DH9mspRFLEcY
-d3D49Ojl4cmrtniIXyfTgcygXbniZzot5vzJZPKiV8I5Vq+mZJhxWiRyKfGn
-MGkyPrL/m9XQaqrH00xNx7nQCC6vwqKiGA8qJH7DkXlnPloNNhwOuZhqU4oY
-oXq9dXlYHrN/q9JSam63xcdY0gPNjUL4JCnlEsN79xgLFzpPjbEjFpLravqr
-jI3Grqoy/GKBCKEHKwioF7SIX5HZBZAayB6+UBe9g+jLfMQni1RzvZRxOqP9
-EYyQd5YWkFIU1vacBYgRfCp0GnOPCtyiAtYRpk/kGPMtiliYgiisq3YuVrzS
-koTKLaBZNWcZJFYzt6Tms1LlXBV2FB4zhT+lN3+eJglSlB2RPEkVW/Hfb6X0
-8Yo9bLzYR+hJamKTqVyLLRM+rV3aUI6RZa3ipCVmQI3G0JOmZ3+ryPekWROe
-ObDNVPCRUUwkiXVVKXN13vQzbQKty3Q+lyXHgrXwMMAff/zBbg8br9u882o/
-ZZfNZ5dBjlMrB33RfIrBTlr7+suw87rdfEqD/WJu5c7rsraHH9yoXpd8H8qf
-Oo03ZtNg8gq/VozO4NauG2LcNPjE2T5IctPgLynGy4aPPzD4XyrGJwUSRd77
-iG/N0rlNNQfhDwet+G5TlMEVY0+Q1z6pQQoCLEoX+xbgQBxiU+HZOv1pZKEM
-8JHrWC2lBSKDZGatZEY+PFfGvgVMP1IFzcYHDTgAXJ230aCFC5K/JXQEAdF8
-8OzsdDLYdv/z58f2/cnhT2dHJ4cH9P70yf7Tp/UbN4Lhw/HZU/+c3q1nPjp+
-9uzw+YGb/Gz/1cCB8uD4xeTo+Pn+0wEpZtUBJ6scUpYywBDRoWUpCYaEhsF0
-XKZTfMCc9+//hFq/t7v74OoKyh8QlqVBYyBbS2EAJAfI2OcWUWSZa49/drVf
-UKhe39qicrXdY12CN1eDZioDPFNZtmtEjALhXC9FDP/vwMshgVwNnqVI+mP7
-DQPJsXSFKzeCqoiA0FhLEEclpxPOw7+5gg3iTKR5KHYioKJFXRTpiwXqqxFU
-ZY0CLUBR4FWRAmyzFU/d5isH0X5mqHVuJ7c60STnsSkFJL4sna2B6iKO5dKI
-KXjbBQoV1eiwbI3QWAg200B+rNQUvmU+7eRYlmqWYrWGseG565Lm/VZef7gu
-eh+ybr3xdbQu+qHYNxnBdVyCOZogqJCrzkyuCL5hlZa4KHi5eBtImuU3Uhuq
-egxkbKlSmmkDvFP82uAAK/jvkbgAlaoUvpJr+/UV60Idvdh+W5qvNIVUYzqc
-XUqkj3aFnLzaCkBL64hSrIMaLlrK0qSyJ7JFldgYhkw0tBm+CJYqSYkXurhy
-2brOLrvrz3LqaCFC5daPP0++Rgx4uv61C5A05IxuWKyunQ742oaE5Zx/IFmA
-lBEOHACREjGL8Dw7OdJ14Nq8Je+7HPCudUQS4IQkYGtUth7f2JAfIUstC0q2
-e4hRSCeEBahsyDdxjiONzSRH4rqqnafIb5UjfWwe5xIL8ltyNB+xZTXNQFxJ
-8tRWAVVksCsPcGldTXkUWPZH4QwdzMbnIqskX4q0DMxw5R27DiK2FCXGWtWC
-A+ikUnN6PFuohLBFAjFMherTeYY4ZLVnLUm0LqANMZhqzyDMeONmDOrQ5E7G
-qXTSw5kILdYMrXCWQjCFt2SNra0tmFckbl6dIK38WidQ7QgAqYs9HGZKetLO
-KFhOcN3NfRxobfo/hl08BAQ/t6cHTBjx48Lji5MPWqZJmMvWAdKILDzVS1Wg
-RlvbCL63s8OP/+q/1rLtZlRHCoGrK1YjQK2BZxq9iOGgaqqSFWw4adW7lOCj
-UMWwPn9z+U7QQaGpNJZNujD5lWatbSLH3clcY8Tj2BuUbDjeHe2CJ2kTNc9S
-I7+R7QHs2yZH3Tj4XqJklVyuftyZ7plsmh7dP8pf3n318+7F9PFZOvtJPWzy
-NXfqgMA1Z3NLR53jwIlTiWjbJ5jBucLrF/TxnmKIPUOn7clqie3Ecpn58jj+
-VavizzxeiBLmeHg2+WH4LXsk4oUcPnInzQg7DrVBYWUvSjHPhf0ipiGAaeDp
-APg7iPiAWgPReHxxcdG0GSgaXycZxr23p/yNtMMCVVlEfmYU+gNRGBfR8m+W
-cI9dkdPwLGxLHYlwtG1uPnYoO8CEKyuH/xzxX8IaPVu6QZGBrd7srnf7wMi9
-jx55h+R5za76YkMvPxgcztEUHaeBSKBY+7cfKtc12tgOge97UPLUedPMexA9
-WxQAvnQOoHodzGy5iu4hK4EzArxNGldgdTV9BGwNiAoX8wGWZAN75rafmlyx
-Xaec9ts2wPEQG2Urj7H7SYDY9cSAt2yiuD3aN1ftYMN2Xzmk4rluS7w4Pp2w
-Dq7SsmHRgKrbTQhsINlaOLZByjeZwVrSqd1GJhatSQfwYa1nVcZCojeFvwGq
-Afz50qy6iO0RdnM6MZF4oZTrDGlQ5sIQqZ8XxKxpS2+NbVuSfZyzdNbSYAEO
-Bug/T1WlabaPsySYsIGvzvWW/SaKooxZEuyDyZliPTzpJzFgRu4kh7D2pmHN
-PeyJEmc5pOa1JnH8PJw9m7nBnNo+QIK8deW5gLLOPgkdKcpSle7orPGtyCCz
-dYWNJ6R5RYUvoRjTHtqJ716CHiSSX/IDe9Bc2pJ4yS79sb+VzdReuAvhMdrb
-PYhiQw6ZTck6JXpVUmsMfuqMg6Es27tINZ10HQVwy+76ZUWz1PEZOKRfyc7O
-U237w27OnYYonXTCWBJGkJ7Oe5Q+1lU9AOGWu9tYLjzx68ALal6kv6+53EYI
-X5cY1PBEZPvANvjkojs0AWzo+FagTSHfe6YwsXLtPbhRTfAcC0dG2Y7qan0i
-SymF5+c4o3CRq6qwLNikoNyXFv5xzqVkL8sA/c22nIunT+QCNV5tQiDTHvuA
-7T6jGzZuc2WkyvFSFkcHxF0Li3d0P+LOWZ5pEEJ6KuVLUESbfjlC5TiHFYTK
-f1it0rL8rsk72vUVMvURr6alP4d2udKzhungg2vo2KksETXXm+WjCVhXwx76
-0FZxTR7cKcUV4EaZmqjQCl/Hjb0G+OTi6UKjUzw7rd4vWD+dFp9fQeGzu/y5
-4p5CN0vo/7H+A1jvI+k/C+7vfnm4d3ZpIH4nLT4D9PtgvdMCATdfqEK+Kap8
-SieBm9Hc+/BLA3pTJML12wSW9/m9e/f47t6dux04d0L1IXrHkv8eUG8CxBcB
-96BvD75vKLyG+NaF1vste4e56j8h4owICm37gJQY2qXVzGpcxKu6Yxm0AiRQ
-R6fYaEtfpFnGgEe2CQdbb4dOFcAkSWczggDjbrQ3zqT2diTLLH2nse66H+hm
-LiSySb6jEyDFsFwInC1Km749YhGC0U1WUjkfMjwIXSBM176b2u3f05G4LlfE
-8kXr2tftxDrnkd5O7bYDwVCYyoaCVo4yd1cp63YYxWNDxFiVmEQnrwrebMcg
-1lqa0EyzMo06rq6hCGaSnaujm7rs1ISQm93saQqF4U3ffK8PQD2nRzo9ScAu
-n4r4LR2deC98ugK/adyvqEysMiWSDe9gJTqb2p8s1L1ZawRXW1yj2FkYtsvo
-6NbnP4vyWKzzzJvMdxYm7tbfMaOWaQ+dvS1L+kCkUFWm5mfv9U2jbLEbeg9d
-+tTepSZPnqlQ25Vtdt5pYqOV7iOnT/1tywaKlSNNbBP6ttdB1zrEX9t1aCFj
-gzrtt2PaA64jmk7zmzTmiZKWIbD1MT1EZZ/LQb+aObveOltt06XGap2Om0G9
-6MxeWwAIRHBHjQsNmDEOP62EzMf4rKI79dHmstqGc1i3sSjdx9Clll4V8aJU
-hao0Q9KSwK5F4W95/OUMjT19um8RtUf1Ji4yIiF6E/fqnof7HReh+jWGtHch
-rGXKtZTZqr46SctGQv0PsuQvyR1tEW9QxzY8fVa3IPzYqY1m7pZzgyA6NvEF
-eeGn3Vk4FmkrGNHHl48Xy3j1Pf1bTNPvM/n4BxM/fpcdPXm+8+pvJ/j/74vp
-k5fZ07l62OGWTrE+bunLQrsi/JcwzKB1D8O8Ru01z9z3P2z4KN3tPWYPtthS
-6ZutnZSxvx6AaMQcffUSUyK9bXPZCPjVpOR/OjPcu+8un5CZzYuia6zmxvq7
-rL7LJL+YMHb9uw/ufHvv/s7OzuDaiyX6rW5kC6/uXAQN6R4oAlGRkbP7gIeL
-sX86iN3tk73mer3dF9F0/d51bculp4cT8ibw1NI3xv4B1YU6gfUuAAA=
+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
 
 -->
 

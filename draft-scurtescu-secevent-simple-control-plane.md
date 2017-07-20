@@ -121,6 +121,55 @@ parameters for the SET delivery method. The actual delivery method is
 identified by the special key "delivery_method" with the value being a URI as
 defined in [DELIVERY](#DELIVERY).
 
+status
+: A string indicating the current status of the event stream. It MUST have one 
+of the following values:
+
+  {: vspace="0"}
+  enabled
+  : The transmitter will transmit events over the stream, according to the
+  stream's configured delivery method.
+
+  paused
+  : The transmitter will not transmit events over the stream. The transmitter
+  will hold any events it would have transmitted while paused, and will
+  transmit them when the stream's status becomes "enabled".
+
+  disabled
+  : The transmitter will not transmit events over the stream, and will not
+  hold any events for later transmission.
+  
+### Checking a Stream's Status
+An Event Receiver checks the current status of an event stream by making an
+HTTP GET request to the stream's status endpoint. On receiving a valid request
+the Event Transmitter responds with a 200 OK response containing a {{!JSON}}
+object with a single attribute "status", whose string value is the value of
+the stream's status.
+
+The following is a non-normative example request to check an event stream's
+status:
+
+~~~
+GET /set/stream/status HTTP/1.1
+Host: transmitter.example.com
+Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
+~~~
+{: #figstatusreq title="Example: Check Stream Status Request"}
+
+The following is a non-normative example response:
+
+~~~
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  "status": "enabled"
+}
+~~~
+{: #figstatusresp title="Example: Check Stream Status Response"}
+
 ### Reading a Stream's Configuration
 An Event Receiver gets the current configuration of a stream by making an
 HTTP GET request to the configuration endpoint. On receiving a valid request
@@ -135,7 +184,7 @@ GET /set/stream HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 ~~~
-{: #figstatusreq title="Example: Stream Status Request"}
+{: #figconfigreq title="Example: Read Stream Configuration Request"}
 
 The following is a non-normative example response:
 
@@ -158,7 +207,7 @@ Pragma: no-cache
   ]
 }
 ~~~
-{: #figstatusresp title="Example: Stream Status Response"}
+{: #figconfigresp title="Example: Read Stream Configuration Response"}
 
 Subjects {#subjects}
 --------------------
