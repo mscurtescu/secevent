@@ -87,51 +87,43 @@ In addition to terms defined in [SET](#SET), this
 specification uses the following terms:
 
 {: vspace="0"}
-Event Stream
-: An Event Stream is a configured relationship between a single Event
-  Transmitter and a single Event Receiver, describing one or more methods by
-  which the Event Transmitter may deliver SETs to the Event Receiver. Event
-  Streams are unidirectional, with only one Event Transmitter and one Event
-  Receiver. Event Transmitters support only one Event Streams for a
-  single Event Receiver.
-
-Event Stream Management Endpoint
-: A URL hosted by the transmitter; it serves as the stream
-  management API for a stream. An Event Transmitter MAY use a single
-  Management Endpoint for multiple streams, provided that the transmitter
-  has some mechanism through which they can identify the applicable stream
-  for any given request, e.g. from authentication credentials. The
-  definition of such mechanisms is outside the scope of this specification.
-
-Add Subject Endpoint
-: A URL hosted by the transmitter used to add subjects to an Event Stream.
-
-Remove Subject Endpoint
-: A URL hosted by the transmitter used to remove subjects from an Event Stream.
-
-Verification Endpoint
-: A URL hosted by the transmitter used to trigger a Verification Event to be
-  sent to the receiver.
-
-Event Stream Management API
-: The API collectively made up by the four endpoints defined above.
-
 Subject Identifier Object
 : A JSON object containing a set of one or more claims about a subject that
   when taken together uniquely identify that subject. This set of claims
   SHOULD be declared as an acceptable way to identify subjects of SETs by
   one or more specifications that profile [SET](#SET).
 
-Verification Event
-: A special event type for testing Event Streams. Receivers can request
-  such an event through the Verification Endpoint. Transmitters can
-  periodically send these events to ensure the connection is alive.
-
 Event Stream Management {#management}
 =======================
 Event Receivers manage how they receive events, and the subjects about which
 they want to receive events over an Event Stream by making HTTP requests to
 endpoints in the Event Stream Management API.
+
+The Event Stream Management API is implemented by the Event Transmitter and
+consists of the following endpoints:
+
+{: vspace="0"}
+Configuration Endpoint
+: An endpoint used to read the Event Stream's current configuration.
+
+Status Endpoint
+: An endpoint used to read the Event Stream's current status.
+
+Add Subject Endpoint
+: An endpoint used to add subjects to an Event Stream.
+
+Remove Subject Endpoint
+: An endpoint used to remove subjects from an Event Stream.
+
+Verification Endpoint
+: An endpoint used to request the Event Transmitter transmit a Verification
+Event over the Event Stream.
+
+An Event Transmitter MAY use the same URLs as endpoints for multiple streams,
+provided that the Event Transmitter has some mechanism through which they can
+identify the applicable Event Stream for any given request, e.g. from
+authentication credentials. The definition of such mechanisms is outside the
+scope of this specification.
 
 Stream Configuration {#stream}
 --------------------
@@ -155,11 +147,60 @@ parameters for the SET delivery method. The actual delivery method is
 identified by the special key "delivery_method" with the value being a URI as
 defined in [DELIVERY](#DELIVERY).
 
+status
+: A string indicating the current status of the event stream. It MUST have one 
+of the following values:
+
+  {: vspace="0"}
+  enabled
+  : The transmitter will transmit events over the stream, according to the
+  stream's configured delivery method.
+
+  paused
+  : The transmitter will not transmit events over the stream. The transmitter
+  will hold any events it would have transmitted while paused, and will
+  transmit them when the stream's status becomes "enabled".
+
+  disabled
+  : The transmitter will not transmit events over the stream, and will not
+  hold any events for later transmission.
+  
+### Checking a Stream's Status
+An Event Receiver checks the current status of an event stream by making an
+HTTP GET request to the stream's Status Endpoint. On receiving a valid request
+the Event Transmitter responds with a 200 OK response containing a {{!JSON}}
+object with a single attribute "status", whose string value is the value of
+the stream's status.
+
+The following is a non-normative example request to check an event stream's
+status:
+
+~~~
+GET /set/stream/status HTTP/1.1
+Host: transmitter.example.com
+Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
+~~~
+{: #figstatusreq title="Example: Check Stream Status Request"}
+
+The following is a non-normative example response:
+
+~~~
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  "status": "enabled"
+}
+~~~
+{: #figstatusresp title="Example: Check Stream Status Response"}
+
 ### Reading a Stream's Configuration
 An Event Receiver gets the current configuration of a stream by making an
-HTTP GET request to the Event Stream Management Endpoint. On receiving a valid
-request the Event Transmitter responds with a 200 OK response containing a
-{{!JSON}} representation of the stream's configuration in the body.
+HTTP GET request to the Configuration Endpoint. On receiving a valid request
+the Event Transmitter responds with a 200 OK response containing a {{!JSON}}
+representation of the stream's configuration in the body.
 
 The following is a non-normative example request to read an Event Stream's
 configuration:
@@ -169,7 +210,7 @@ GET /set/stream HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 ~~~
-{: #figstatusreq title="Example: Stream Status Request"}
+{: #figconfigreq title="Example: Read Stream Configuration Request"}
 
 The following is a non-normative example response:
 
@@ -182,22 +223,17 @@ Pragma: no-cache
 {
   "aud": "http://www.example.com",
   "delivery": {
-    "delivery_method": "https://schemas.example.com/set/http-push",
+    "delivery_method": "urn:example:secevent:delivery:http_post",
     "url": "https://receiver.example.com/events"
   },
   "events": [
-    "https://schemas.openid.net/risc/event-type/account-at-risk",
-    "https://schemas.openid.net/risc/event-type/account-deleted",
-    "https://schemas.openid.net/risc/event-type/account-locked",
-    "https://schemas.openid.net/risc/event-type/account-unlocked",
-    "https://schemas.openid.net/risc/event-type/client-credentials-
-        revoked",
-    "https://schemas.openid.net/risc/event-type/sessions-revoked",
-    "https://schemas.openid.net/risc/event-type/tokens-revoked"
+    "urn:example:secevent:events:type_1",
+    "urn:example:secevent:events:type_2",
+    "urn:example:secevent:events:type_3"
   ]
 }
 ~~~
-{: #figstatusresp title="Example: Stream Status Response"}
+{: #figconfigresp title="Example: Read Stream Configuration Response"}
 
 Subjects {#subjects}
 --------------------
@@ -278,7 +314,7 @@ Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
 {
-  "phone_number": "123-456-7890"
+  "phone_number": "+1 206 555 0123"
 }
 ~~~
 {: #figremovereq title="Example: Remove Subject Request"}
@@ -377,6 +413,56 @@ the Event Receiver as a result of the above request:
 }
 ~~~
 {: #figverifyset title="Example: Verification SET"}
+
+Security Considerations {#SecCon}
+=======================
+
+Subject Probing
+---------------
+It may be possible for an Event Transmitter to leak information about subjects
+through their responses to add subject requests. A 404 response may indicate
+to the Event Receiver that the subject does not exist, which may inadvertantly
+reveal information about the subject (e.g. that a particular individual does
+or does not use the Event Transmitter's service).
+
+Event Transmitters SHOULD carefully evaluate the conditions under which they
+will return error responses to add subject requests. Event Transmitters MAY
+return a 204 response even if they will not actually send any events related
+to the subject, and Event Receivers MUST NOT assume that a 204 response means
+that they will receive events related to the subject.
+
+Information Harvesting
+----------------------
+SETs may contain personally identifiable information (PII) or other non-public
+information about the event transmitter, the subject (of an event in the SET),
+or the relationship between the two. It is important for Event Transmitters to
+understand what information they are revealing to Event Receivers when
+transmitting events to them, lest the event stream become a vector for 
+unauthorized access to private information.
+
+Event Transmitters SHOULD interpret add subject requests as statements of
+interest in a subject by an Event Receiver, and ARE NOT obligated to transmit
+events related to every subject an Event Receiver adds to the stream. Event
+Transmitters MAY choose to transmit some, all, or no events related to any
+given subject and SHOULD validate that they are permitted to share the
+information contained within an event with the Event Receiver before
+transmitting the event. The mechanisms by which such validation is performed
+are outside the scope of this specification.
+
+Malicious Subject Removal
+-------------------------
+A malicious party may find it advantageous to remove a particular subject from
+a stream, in order to reduce the Event Receiver's ability to detect
+malicious activity related to the subject, inconvenience the subject, or for
+other reasons. Consequently it may be in the best interests of the subject for
+the Event Transmitter to continue to send events related to the subject for
+some time after the subject has been removed from a stream.
+
+Event Transmitters MAY continue sending events related to a subject for some
+amount of time after that subject has been removed from the stream. Event
+Receivers MUST tolerate receiving events for subjects that have been removed
+from the stream, and MUST NOT report these events as errors to the Event
+Transmitter.
 
 --- back
 
