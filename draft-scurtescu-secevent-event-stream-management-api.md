@@ -99,6 +99,32 @@ Event Receivers manage how they receive events, and the subjects about which
 they want to receive events over an Event Stream by making HTTP requests to
 endpoints in the Event Stream Management API.
 
+The Event Stream Management API is implemented by the Event Transmitter and
+consists of the following endpoints:
+
+{: vspace="0"}
+Configuration Endpoint
+: An endpoint used to read the Event Stream's current configuration.
+
+Status Endpoint
+: An endpoint used to read the Event Stream's current status.
+
+Add Subject Endpoint
+: An endpoint used to add subjects to an Event Stream.
+
+Remove Subject Endpoint
+: An endpoint used to remove subjects from an Event Stream.
+
+Verification Endpoint
+: An endpoint used to request the Event Transmitter transmit a Verification
+Event over the Event Stream.
+
+An Event Transmitter MAY use the same URLs as endpoints for multiple streams,
+provided that the Event Transmitter has some mechanism through which they can
+identify the applicable Event Stream for any given request, e.g. from
+authentication credentials. The definition of such mechanisms is outside the
+scope of this specification.
+
 Stream Configuration {#stream}
 --------------------
 An Event Stream's configuration is represented as a JSON object with the
@@ -141,7 +167,7 @@ of the following values:
   
 ### Checking a Stream's Status
 An Event Receiver checks the current status of an event stream by making an
-HTTP GET request to the stream's status endpoint. On receiving a valid request
+HTTP GET request to the stream's Status Endpoint. On receiving a valid request
 the Event Transmitter responds with a 200 OK response containing a {{!JSON}}
 object with a single attribute "status", whose string value is the value of
 the stream's status.
@@ -172,7 +198,7 @@ Pragma: no-cache
 
 ### Reading a Stream's Configuration
 An Event Receiver gets the current configuration of a stream by making an
-HTTP GET request to the configuration endpoint. On receiving a valid request
+HTTP GET request to the Configuration Endpoint. On receiving a valid request
 the Event Transmitter responds with a 200 OK response containing a {{!JSON}}
 representation of the stream's configuration in the body.
 
@@ -217,7 +243,7 @@ receiver wants to receive events about a particular subject by "adding" or
 
 ### Adding a Subject to a Stream
 To add a subject to an Event Stream, the Event Receiver makes an HTTP POST
-request to the add subject endpoint, containing in the body a Subject
+request to the Add Subject Endpoint, containing in the body a Subject
 Identifier Object identifying the subject to be added. On a successful
 response, the Event Transmitter responds with an empty 200 OK response.
 
@@ -264,7 +290,7 @@ Pragma: no-cache
 
 ### Removing a Subject
 To remove a subject from an Event Stream, the Event Receiver makes an HTTP
-POST request to the Remove Subject endpoint, containing in the body a Subject
+POST request to the Remove Subject Endpoint, containing in the body a Subject
 Identifier Object identifying the subject to be removed. On a successful
 response, the Event Transmitter responds with a 204 No Content response.
 
@@ -323,12 +349,12 @@ state
 
 ### Triggering a Verification Event.
 To request that a verification event be sent over an Event Stream, the Event
-Receiver makes an HTTP POST request to the verification endpoint, with a JSON
+Receiver makes an HTTP POST request to the Verification Endpoint, with a JSON
 object containing the parameters of the verification request, if any. On a
 successful request, the event transmitter responds with an empty 204 No Content
 response.
 
-A successful response from a POST to the verification endpoint does not
+A successful response from a POST to the Verification Endpoint does not
 indicate that the verification event was transmitted successfully, only that
 the Event Transmitter has transmitted the event or will do so at some point
 in the future. Event Transmitters MAY transmit the event via an asynchronous
