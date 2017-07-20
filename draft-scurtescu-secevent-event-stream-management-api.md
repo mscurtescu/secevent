@@ -147,6 +147,13 @@ parameters for the SET delivery method. The actual delivery method is
 identified by the special key "delivery_method" with the value being a URI as
 defined in [DELIVERY](#DELIVERY).
 
+min_verification_interval
+: An integer indicating the minimum amount of time in seconds that must pass
+in between verification requests. If an Event Receiver submits verification
+requests more frequently than this, the Event Transmitter MAY respond with a
+429 status code. An Event Transmitter MUST NOT respond with a 429 status code
+if an Event Receiver is not exceeding this frequency.
+
 status
 : A string indicating the current status of the event stream. It MUST have one 
 of the following values:
@@ -230,7 +237,9 @@ Pragma: no-cache
     "urn:example:secevent:events:type_1",
     "urn:example:secevent:events:type_2",
     "urn:example:secevent:events:type_3"
-  ]
+  ],
+  "min_verification_interval": 60,
+  "status": "enabled"
 }
 ~~~
 {: #figconfigresp title="Example: Read Stream Configuration Response"}
