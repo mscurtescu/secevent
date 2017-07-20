@@ -449,8 +449,8 @@ information contained within an event with the Event Receiver before
 transmitting the event. The mechanisms by which such validation is performed
 are outside the scope of this specification.
 
-Malicous Subject Removal
-------------------------
+Malicious Subject Removal
+-------------------------
 A malicious party may find it advantageous to remove a particular subject from
 a stream, in order to reduce the Event Receiver's ability to detect
 malicious activity related to the subject, inconvenience the subject, or for
