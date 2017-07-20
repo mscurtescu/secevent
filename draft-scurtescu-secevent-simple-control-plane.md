@@ -87,45 +87,11 @@ In addition to terms defined in [SET](#SET), this
 specification uses the following terms:
 
 {: vspace="0"}
-Event Stream
-: An Event Stream is a configured relationship between a single Event
-  Transmitter and a single Event Receiver, describing one or more methods by
-  which the Event Transmitter may deliver SETs to the Event Receiver. Event
-  Streams are unidirectional, with only one Event Transmitter and one Event
-  Receiver. Event Transmitters support only one Event Streams for a
-  single Event Receiver.
-
-Event Stream Management Endpoint
-: A URL hosted by the transmitter; it serves as the stream
-  management API for a stream. An Event Transmitter MAY use a single
-  Management Endpoint for multiple streams, provided that the transmitter
-  has some mechanism through which they can identify the applicable stream
-  for any given request, e.g. from authentication credentials. The
-  definition of such mechanisms is outside the scope of this specification.
-
-Add Subject Endpoint
-: A URL hosted by the transmitter used to add subjects to an Event Stream.
-
-Remove Subject Endpoint
-: A URL hosted by the transmitter used to remove subjects from an Event Stream.
-
-Verification Endpoint
-: A URL hosted by the transmitter used to trigger a Verification Event to be
-  sent to the receiver.
-
-Event Stream Management API
-: The API collectively made up by the four endpoints defined above.
-
 Subject Identifier Object
 : A JSON object containing a set of one or more claims about a subject that
   when taken together uniquely identify that subject. This set of claims
   SHOULD be declared as an acceptable way to identify subjects of SETs by
   one or more specifications that profile [SET](#SET).
-
-Verification Event
-: A special event type for testing Event Streams. Receivers can request
-  such an event through the Verification Endpoint. Transmitters can
-  periodically send these events to ensure the connection is alive.
 
 Event Stream Management {#management}
 =======================
@@ -157,9 +123,9 @@ defined in [DELIVERY](#DELIVERY).
 
 ### Reading a Stream's Configuration
 An Event Receiver gets the current configuration of a stream by making an
-HTTP GET request to the Event Stream Management Endpoint. On receiving a valid
-request the Event Transmitter responds with a 200 OK response containing a
-{{!JSON}} representation of the stream's configuration in the body.
+HTTP GET request to the configuration endpoint. On receiving a valid request
+the Event Transmitter responds with a 200 OK response containing a {{!JSON}}
+representation of the stream's configuration in the body.
 
 The following is a non-normative example request to read an Event Stream's
 configuration:
@@ -207,7 +173,7 @@ receiver wants to receive events about a particular subject by "adding" or
 
 ### Adding a Subject to a Stream
 To add a subject to an Event Stream, the Event Receiver makes an HTTP POST
-request to the Add Subject Endpoint, containing in the body a Subject
+request to the add subject endpoint, containing in the body a Subject
 Identifier Object identifying the subject to be added. On a successful
 response, the Event Transmitter responds with an empty 200 OK response.
 
@@ -254,7 +220,7 @@ Pragma: no-cache
 
 ### Removing a Subject
 To remove a subject from an Event Stream, the Event Receiver makes an HTTP
-POST request to the Remove Subject Endpoint, containing in the body a Subject
+POST request to the Remove Subject endpoint, containing in the body a Subject
 Identifier Object identifying the subject to be removed. On a successful
 response, the Event Transmitter responds with a 204 No Content response.
 
@@ -313,12 +279,12 @@ state
 
 ### Triggering a Verification Event.
 To request that a verification event be sent over an Event Stream, the Event
-Receiver makes an HTTP POST request to the Verification Endpoint, with a JSON
+Receiver makes an HTTP POST request to the verification endpoint, with a JSON
 object containing the parameters of the verification request, if any. On a
 successful request, the event transmitter responds with an empty 204 No Content
 response.
 
-A successful response from a POST to the Verification Endpoint does not
+A successful response from a POST to the verification endpoint does not
 indicate that the verification event was transmitted successfully, only that
 the Event Transmitter has transmitted the event or will do so at some point
 in the future. Event Transmitters MAY transmit the event via an asynchronous

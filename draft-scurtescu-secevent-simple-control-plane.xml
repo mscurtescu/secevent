@@ -90,38 +90,11 @@ document are to be interpreted as described in <xref target="RFC2119"/>.</t>
 specification uses the following terms:</t>
 
 <t><list style="hanging">
-  <t hangText='Event Stream'><vspace blankLines='0'/>
-  An Event Stream is a configured relationship between a single Event
-Transmitter and a single Event Receiver, describing one or more methods by
-which the Event Transmitter may deliver SETs to the Event Receiver. Event
-Streams are unidirectional, with only one Event Transmitter and one Event
-Receiver. Event Transmitters support only one Event Streams for a
-single Event Receiver.</t>
-  <t hangText='Event Stream Management Endpoint'><vspace blankLines='0'/>
-  A URL hosted by the transmitter; it serves as the stream
-management API for a stream. An Event Transmitter MAY use a single
-Management Endpoint for multiple streams, provided that the transmitter
-has some mechanism through which they can identify the applicable stream
-for any given request, e.g. from authentication credentials. The
-definition of such mechanisms is outside the scope of this specification.</t>
-  <t hangText='Add Subject Endpoint'><vspace blankLines='0'/>
-  A URL hosted by the transmitter used to add subjects to an Event Stream.</t>
-  <t hangText='Remove Subject Endpoint'><vspace blankLines='0'/>
-  A URL hosted by the transmitter used to remove subjects from an Event Stream.</t>
-  <t hangText='Verification Endpoint'><vspace blankLines='0'/>
-  A URL hosted by the transmitter used to trigger a Verification Event to be
-sent to the receiver.</t>
-  <t hangText='Event Stream Management API'><vspace blankLines='0'/>
-  The API collectively made up by the four endpoints defined above.</t>
   <t hangText='Subject Identifier Object'><vspace blankLines='0'/>
   A JSON object containing a set of one or more claims about a subject that
 when taken together uniquely identify that subject. This set of claims
 SHOULD be declared as an acceptable way to identify subjects of SETs by
 one or more specifications that profile <xref target="SET"></xref>.</t>
-  <t hangText='Verification Event'><vspace blankLines='0'/>
-  A special event type for testing Event Streams. Receivers can request
-such an event through the Verification Endpoint. Transmitters can
-periodically send these events to ensure the connection is alive.</t>
 </list></t>
 
 </section>
@@ -152,9 +125,9 @@ defined in <xref target="DELIVERY"></xref>.</t>
 
 <section anchor="reading-a-streams-configuration" title="Reading a Stream’s Configuration">
 <t>An Event Receiver gets the current configuration of a stream by making an
-HTTP GET request to the Event Stream Management Endpoint. On receiving a valid
-request the Event Transmitter responds with a 200 OK response containing a
-<xref target="JSON"/> representation of the stream’s configuration in the body.</t>
+HTTP GET request to the configuration endpoint. On receiving a valid request
+the Event Transmitter responds with a 200 OK response containing a <xref target="JSON"/>
+representation of the stream’s configuration in the body.</t>
 
 <t>The following is a non-normative example request to read an Event Stream’s
 configuration:</t>
@@ -201,7 +174,7 @@ receiver wants to receive events about a particular subject by “adding” or
 
 <section anchor="adding-a-subject-to-a-stream" title="Adding a Subject to a Stream">
 <t>To add a subject to an Event Stream, the Event Receiver makes an HTTP POST
-request to the Add Subject Endpoint, containing in the body a Subject
+request to the add subject endpoint, containing in the body a Subject
 Identifier Object identifying the subject to be added. On a successful
 response, the Event Transmitter responds with an empty 200 OK response.</t>
 
@@ -253,7 +226,7 @@ Pragma: no-cache
 </section>
 <section anchor="removing-a-subject" title="Removing a Subject">
 <t>To remove a subject from an Event Stream, the Event Receiver makes an HTTP
-POST request to the Remove Subject Endpoint, containing in the body a Subject
+POST request to the Remove Subject endpoint, containing in the body a Subject
 Identifier Object identifying the subject to be removed. On a successful
 response, the Event Transmitter responds with a 204 No Content response.</t>
 
@@ -318,12 +291,12 @@ a verification request.</t>
 
 <section anchor="triggering-a-verification-event" title="Triggering a Verification Event.">
 <t>To request that a verification event be sent over an Event Stream, the Event
-Receiver makes an HTTP POST request to the Verification Endpoint, with a JSON
+Receiver makes an HTTP POST request to the verification endpoint, with a JSON
 object containing the parameters of the verification request, if any. On a
 successful request, the event transmitter responds with an empty 204 No Content
 response.</t>
 
-<t>A successful response from a POST to the Verification Endpoint does not
+<t>A successful response from a POST to the verification endpoint does not
 indicate that the verification event was transmitted successfully, only that
 the Event Transmitter has transmitted the event or will do so at some point
 in the future. Event Transmitters MAY transmit the event via an asynchronous
@@ -472,98 +445,89 @@ the Event Receiver as a result of the above request:</t>
   </back>
 
 <!-- ##markdown-source:
-H4sIALdzVVkAA+1ba3PbxpL9Pr9ilvqQpEJSjzgP815XRbEUW1nb8tXDudlU
-KjUEhiQiAMOLGUhhLOW37+l5AAMQsh17vVX7YFVkEhj0dM90nz7dg0wmE2Yy
-k8sZfy5KsZSFLA0/fHnCF6ri58cX/PiarpybSopCMzGfV/J6xrU0k0SVplL5
-ZJ2LUrJUJaUoICetxMJMdFJXRuLvRMtEkoyJzop1LruPTfb2WCoMHjvY2/96
-svfV5OAhS3BhqarNjGflQrFsXc24qWptDvb2Hu4dMCagzIyfS8yRmQ27UdXV
-slL1mvRyk7ErucHldMZPSiOrEuoekV6MaSPK9FeRqxKTbqRm62zGfzYqGXOt
-Kpi50Pi2KejLL5iqNitVzRifMI5PVmqs1JSfB/PsVWf4c1Flte7dUtVSlNkf
-wmSqnPEnSi1zaW/IQmT5jBfNQn27tDeniSo6sx1O+XciuSpEGc11WJZiLvNc
-du51JzssxB+qjCersmQl8OS3wt5yU+HDSlUVeOpawlD+w/npixk/+/7x1/tf
-PsRv+vbl/kO6BYeY2Se8z4Qt8F5yoa5kyT/FqM/cKFEtpZnxlTFrPdvdNUrl
-eppJs5hC1d2VKfJd5y50rfUUQ3Ime/tWyA6/OD06nfHLNTkKv8nMimP/c/xZ
-yEqWiZxi3NHxs5NXx2c/ddWD/zqdjmQO66oNv9RZueRPLy5eDmq4hPR6Tguz
-m5WpXEv8KU2W7p7Yf81mYi3Vu/NczXcLoeFc3oRVTT4eTEj9hFPzu3lnM9hk
-MuFirk0lErjq/avLg3g8/a86q6Tmdlr8TCTd0NwouE+aUSwxfHe3IbjURWaM
-HbGSXNfz32RiNGZVteE3K3gI3dhAQb0iIV4iswIQGogevlI3g4PoYjHlF6tM
-c72WSbag+eGM0HeRldBSlHbtOQsQI/hc6CzhHhW4RQXIEWZI5QTPWxSxMAVV
-WN/sQmx4rSUpVVhAs2YucmisFk6k5otKFVyVdhRuM4U/lV/+IktThCg7IX3S
-OrHqv97J6OcdexR92DvYSWZikrls1ZYpnzdbGhnHaGWt4WQlnoAZ0dCzeGf/
-VdPek2UxPHNgm6mxR0YxkaZ2qypZqOt4n2kSWF1ly6WsOAQ2ymMB/vzzT/b5
-JPp8znuf7l12G9+7DXqcWz3oQnwXg5229vP3Se/zeXyXBnthTnLvc9ushx8c
-Za9bfgjjz53FW0/TYNoVfq8avcGdWbfUeNPgM7f2QZM3Df6YaryK9vgtg/9L
-1fhLjkSe93rGdxbZ0oaag/BHo45/dynK6I6xp4hrH9QgBQEWpfN9C3AgDomp
-ca8NfxpZKgN85DpRa2mByCCYWSeYEQ8vlLFfAdOPVUlP44cGHACurrto0MEF
-ya8IHUFANB89vzy/GI3dv/zFqf1+dvyPy5Oz4yP6fv708Nmz5osbwfDj9PKZ
-v0/f2icfnz5/fvziyD38/PCnkQPl0enLi5PTF4fPRmSYNQecrHZIWckAQ0SH
-1pUkGBIaC6aTKpvjB555/frfkOsP9vcf3t3B+CPCsixYDGTrGAyA5AAZe98i
-iqwK7fHPSvsZieqXT3coXY0HVpfgzeWghcoBz5SWrYwZI0e41muRYP/3sMux
-DzDiPl3UAwgLyh9wnZq2vpK5nUGvsjVMNjcSaVNwSvy5B0xk5Ah67fJ1BzTw
-Mg5LRPpRyoCrFArLWUgQQ2zvfANhTd7cxnWbkbxfEiHRPun05pk2inmqbfes
-LrMU2T1xPjh2rEGV+caqsj0XGdLcIerWld7JN8gJ6zUYb19emN9mZ8gYXBa4
-x32ReVymawU3o53il2fPwBa0T3pkdpTP/8YzA8ZeXVPC1CFcaZO5T96dakT4
-u9PWA2LbEQk284eNhJABraykos5NhnTsBSJjrit1naXSJ+CenpC0gn5aFbTt
-RKEzXWAQSo7lKuZMlp5Yorhwxor1Ooe/z/PIMmtKueFLrGNp+ZvUZszldDl1
-xIRKDpLh4ySBT9NPAeoMakV2pU1kEqrpGvM3emmKB3A5DUXcklqIwzizRVew
-i3GqfPedc9wEjkw0o+EW9Lsbm5iglwTfY44+hXGLtDVRJ829xzSBEoluwnSz
-WPCkYPA/SEj19liA60IDygfkxAmAjmL5WiLgCoH9qddBo4WqKy691i2OgpZf
-U2EQls+VIYsMep7aK9ZAqti4ciOISAt4B+BKUJlOOx/jVpKLrAh8X4RVtX5v
-gQw+aQQVGkahMlrRApUZfBQqR66NIPFPBrrvZnLSCcVc0ppTTsbFyqUb7JpI
-Erk2NiRugIxUpgSxzQ5DkEVKi62x8h3v1U4PhO4ig7Qo32x5g4VDWikrANnc
-1xabkPwRgrRiHQScRpybItuHKnkBRRyueCkeCGgbB51w2sXdxFbra4xUVJ/l
-WFm4laUrgC/PUahkKzXxFhKLTS1dFrDZjpLJG7zu9U6LnveRlEesX1b4cqmp
-7UJNFxd+95WMzFWDwgVH90murm1m6ibtOUXAVajFw9qS3ayNAstjejVON7oo
-NNz1x54ACF+wOby9Y31GSx/WoxCf6IY/iLDIlQRL0q5eI8/tBJnNw1Q5ttwF
-bogtNZkcIDCiTp33AWMwNA5RBESdZlT+u9hxpKwlUXbWH+XcVf/wm09/+PHi
-M/i578p85oIgC7igB7iF57eyj5huf6BZYI42s4qqQlwiBC/PTnQTnJae0e67
-OPdb63IfZV6gY0u+7Y5vTchPgEQ2CNLxEB/xkAG3kMwETBHXIsstWgzSJn6d
-CZeYbQ2PNAiB/FNKpmxdz/MMJBCaZ5bsg+hgXXlgxXarCStCM+WdsJT6b7vX
-Iq8lX4usChl14ze2dSK2FhXGWtPCBlBDqmndOAZpczpQ0dSApd49+CFrdrZJ
-XgHDqMQYhSd+dU+MGtfkTse5dNpjM+FaLHat0DKDM4WvtBo7OztYXpG655oA
-6cRXG0DNRiBZON9L6qqiO92IwsoF/hbFPpDQhv8TrIuHgO4+308vp/y09Ejj
-NIW9WcoaKYNcHBG9ViVYu10lwQ/29vjpv/vLWnY2nKEcIme4u2uxoLGl5arb
-2OFAa67SDVbzolPg2FKlVOWkabhy+bugzlBsPsSmfcD8RLPONDPXrKGF24Vn
-7vqlpdXc3Z/uozDWZhbznKmfyDZ9D21Xu+kUfyeRoEE/Nj/szQ9MPs9Ovjop
-Xj346cf9m/mTy2zxD/UoLtBdmwkKN0W6Ez3r9X/OnElUp/+FZXBb4e0L9vid
-YvBCQ+3VC2TuWaDXZMTub1qVf+MgwRWW49HlxfeTb9hjkazk5LFrLc4w40Qb
-0Aj2shLLQtgLCQ0BYANZR0Di0YyPqBc82929ubmJ1ww1OW/DDeNe27buVgB6
-AdRM1hBdCB1LsXtF9yfrWq+sTMioqzx+riGW8YMOcUd44M5q4n/P+M9ORn9S
-ZCMUj9MS81WZTnZ9Zx3rtgsKpqhZLcwEt66CFu8hAcZTJ+EDJOQqufogAXX5
-3iKSPKPvUYHljl3oU8lr9X5StdSa2Onk/UXY849WAJ7/hd0NRaBevzUEXThR
-DJ4H4gZy5L++jR416G4rW3+c0KnzYnRF8WCTMJIdtdeIHwVXttxQD5DDUIcg
-WaLirVEpNCUJ0sSIOkzlcgSRbGTrQPsrrj+G8sXYwkgotXxOO0xDSmsfDPmN
-XbhSVsRSewg8HqIfRFbabv/L0/ML1stjQwX2OE40Ub5olWNbhd42E2s1RZUF
-7WVqcyLZgBpL60WdswCn43dLiChpirXZ9POiz2PDPZdkpZQ7cNEow0pDheKy
-VL5yafobRIE8nrFs0bGAmitIsNeZqjU97f0sDUsYV+uhP7MBjSMvY7boaIum
-eTw8va/XduIapHBrvzQsnsM2aitp6qq8d0lcPRRaunFssLg30PaTglvcwFi3
-PimVcFWlKtfr07gqcuhst8L6E8K8JnqRugaZS6BUX9yCjqWS3/Ij25xcW+Jx
-y259N70TzdS1fwDlMdqve1DFuhwim4J1TnS2olYI9qk3jhpKFNg3maYGsiVa
-3Ind92JFTCj4ApzdS7JPF5m2x67umS8iVXrhhLGkjCA72waT3aoBgHDiHkTi
-wh0vB7uglmX2R8udt1z4vsCgri082zu2wS/n3aG3bl3Hn7DZEPJHuuQmVq+D
-h280kyp+G8nKHlRu2go4oxBeXmfUtC4oxVm+maHEubXwb8Scgr2qAvR3EMb6
-019kXA1ebUMg0x77gO0+oqM17tYmCJVT5LSTI6oVqF3hXjtwda3nc4SQnrD6
-FDSjST8ebXXMzipCFCtIq7Wsvo3ZXTe/Qqchehuv9IeQW5d6WpgOe3AP6T2n
-Fnl1/7K8M83tWzhAH7omtuTBVYUuAUdp6qJpz7Z+M9SffXvydK7RS573NI8/
-Qv50Vnx4BsWePeAvFPeFSpxC/x/r34L13pP+Z8H9g48P925dIsTvh8X7g/4Q
-rPdaTuDmK1XKX8u6mFMl8GY093v4sQE9Volwff/gi8mDL7+afP3Nw70eljuN
-huC8t4z/PYgeo8NHQfZg7wC4bxnc4nvn4OL1jn0vaDNcHqJABH+2TVeKCu1i
-amEtLpNN0x4OVtlymKty6wzgJstzBjCyHU+s9Ti0BYEkabZYUPwbf17ajyn7
-xkGeW+5OY90rdM1xv/ydyj9yYLkSKCzc0fiAWgRfdMqS1m4PGW5E7xKEE+f+
-YUl0HuQovui8SuVmYr1iZLAtPnYIGLJSFRlo9agKdzbXdhzJHyMVE1XRGwIo
-nGrsZtcHIWttQr/S6tQ/GmtwCMske69jvOlIgzoQcvvoYJ7BYOymP+loqp+B
-0pFKJwnM5XORXFHdxAex02X37cX9hHLEJlci3dodOvn3LwO0jfBwAN505d0K
-V/ZtETm4fxbiIax3zy+ZbytcuGNjR4u2Tx2njiK9xVMoJduj5aGzsihnsTc0
-HvrcafAochxoCnW22fYxBz0YnVt4zxkyf2ypQLlxjIltQ9+4dbpOBX9vy6GD
-jBFvOuz6tAdcxzKd5W+ymKdKWnrA2ho9eOXQltOLKFHMtlPnm7F7VaYJx22n
-XvWeblcACERwR10LDZgxDj/dOwrexxc1vac2+KoOuXOQGwmlwy86QdSbMllV
-qlS1ZghaUtj1J/yRmj8Jo7Hnzw4tog6YHuMiIwait3GvaXi4d6MJ1e9ZSHvw
-xDpL2WqZb5pzqqyKAur/IEX+mMTRJvGIN3YD5INaBe3bMvHeuyPlLXbo2MRH
-JIV/7VjIUUibwYg7vnqyWieb7+i/1Tz7LpdPvjfJk9/zk6cv9n765xn+/Y/V
-/Omr/NlSPepxS2fYELf0aaGLSf9LGGaweoBh3mN2yzMP/Vsk72S7PTQewBb/
-FhYbCBn7qgZUI+bos5d9h6q3XNYDfjOZrx1QOrjzPURmfBJ3z6q5sf64cOi0
-zgsTxsp/8PCLb778am9vbzR4cldX5Yz+/5eZTbx6Fv4fkll7IjQDUZEzt+4j
-Hs4e39uJ3YmUPUf8ZTzk0fSuQ39rO1t6fnxBuwk8tfSNsf8EySKIp0k2AAA=
+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
+W3p6OKHdBJ5a+sbYPwGvtMOeWDAAAA==
 
 -->
 
