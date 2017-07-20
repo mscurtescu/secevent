@@ -148,18 +148,13 @@ Pragma: no-cache
 {
   "aud": "http://www.example.com",
   "delivery": {
-    "delivery_method": "https://schemas.example.com/set/http-push",
+    "delivery_method": "urn:example:secevent:delivery:http_post",
     "url": "https://receiver.example.com/events"
   },
   "events": [
-    "https://schemas.openid.net/risc/event-type/account-at-risk",
-    "https://schemas.openid.net/risc/event-type/account-deleted",
-    "https://schemas.openid.net/risc/event-type/account-locked",
-    "https://schemas.openid.net/risc/event-type/account-unlocked",
-    "https://schemas.openid.net/risc/event-type/client-credentials-
-        revoked",
-    "https://schemas.openid.net/risc/event-type/sessions-revoked",
-    "https://schemas.openid.net/risc/event-type/tokens-revoked"
+    "urn:example:secevent:events:type_1",
+    "urn:example:secevent:events:type_2",
+    "urn:example:secevent:events:type_3"
   ]
 }
 ~~~
@@ -244,7 +239,7 @@ Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
 {
-  "phone_number": "123-456-7890"
+  "phone_number": "+1 206 555 1234"
 }
 ~~~
 {: #figremovereq title="Example: Remove Subject Request"}
