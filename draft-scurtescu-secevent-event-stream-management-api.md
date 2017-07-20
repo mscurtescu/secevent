@@ -314,7 +314,7 @@ Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
 {
-  "phone_number": "+1 206 555 1234"
+  "phone_number": "+1 206 555 0123"
 }
 ~~~
 {: #figremovereq title="Example: Remove Subject Request"}
