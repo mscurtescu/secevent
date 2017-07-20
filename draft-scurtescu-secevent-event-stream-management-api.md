@@ -1,7 +1,7 @@
 ---
 title: Management API for SET Event Streams
-abbrev: set-control-plane
-docname: draft-scurtescu-secevent-simple-control-plane-00
+abbrev: event-stream-management-api
+docname: draft-scurtescu-secevent-event-stream-management-api-00
 date: 2017-06-29
 category: info
 ipr: trust200902
