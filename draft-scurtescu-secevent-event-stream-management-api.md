@@ -329,23 +329,42 @@ Pragma: no-cache
 ~~~
 {: #figremoveresp title="Example: Remove Subject Response"}
 
-Verification {#verify}
+Verification {#verification}
 ----------------------
 In some cases, the frequency of event transmission on an Event Stream will
 be very low, making it difficult for an Event Receiver to tell the
 difference between expected behavior and event transmission failure due to a
 misconfigured stream. Event Receivers can request that a verification event
 be transmitted over the Event Stream, allowing the receiver to confirm that
-the stream is configured correctly upon successful receipt of the event.
+the stream is configured correctly upon successful receipt of the event. The
+acknowledgment of a Verification Event also confirms to the Event Transmitter
+that end-to-end delivery is working, including signature verification and
+encryption.
 
-Verification requests have the following properties:
+An Event Transmitter MAY send a Verification Event at any time, even if one
+was not requested by the Event Receiver.
+
+### Verification Event
+The Verification Event is a standard SET with the following attributes:
 
 {: vspace="0"}
+event type
+: The Event Type URI is:
+  "urn:ietf:params:secevent:event-type:core:verification".
+
 state
-: OPTIONAL. An arbitrary string that the Event Transmitter MUST echo back to
-  the Event Receiver in the verification event's payload. Event Receivers
-  MAY use the value of this parameter to correlate a verification event with
-  a verification request.
+: OPTIONAL An opaque value provided by the Event Receiver when the event is
+  triggered. This is a nested attribute in the event payload.
+
+Upon receiving a Verification Event, the Event Receiver SHALL parse the SET
+and validate its claims. In particular, the Event Receiver SHALL confirm that
+the value for "state" is as expected. If the value of "state" does not match,
+an error response of "setData" SHOULD be returned (see Section 2.4 of
+{{DELIVERY}}).
+
+In many cases, Event Transmitters MAY disable or suspend an Event
+Stream that fails to successfully verify based on the acknowledgement
+or lack of acknowledgement by the Event Receiver.
 
 ### Triggering a Verification Event.
 To request that a verification event be sent over an Event Stream, the Event
@@ -354,13 +373,24 @@ object containing the parameters of the verification request, if any. On a
 successful request, the event transmitter responds with an empty 204 No Content
 response.
 
+Verification requests have the following properties:
+
+{: vspace="0"}
+state
+: OPTIONAL. An arbitrary string that the Event Transmitter MUST echo back to
+  the Event Receiver in the verification event's payload. Event Receivers
+  MAY use the value of this parameter to correlate a verification event with
+  a verification request. If the verification event is initiated by the
+  transmitter then this parameter MUST not be set.
+
 A successful response from a POST to the Verification Endpoint does not
 indicate that the verification event was transmitted successfully, only that
 the Event Transmitter has transmitted the event or will do so at some point
 in the future. Event Transmitters MAY transmit the event via an asynchronous
 process, and SHOULD publish an SLA for verification event transmission
 times. Event Receivers MUST NOT depend on the verification event being
-transmitted synchronously with their request.
+transmitted synchronously or in any particular order relative to the current
+queue of events.
 
 Errors are signaled with HTTP staus codes as follows:
 
@@ -406,7 +436,7 @@ the Event Receiver as a result of the above request:
   "aud": "receiver.example.com",
   "iat": "1493856000",
   "events": [
-    "urn:ietf:params:secevent:event-type:core:verify" : {
+    "urn:ietf:params:secevent:event-type:core:verification" : {
       "state": "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo=",
     },
   ],
