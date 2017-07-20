@@ -388,5 +388,55 @@ the Event Receiver as a result of the above request:
 ~~~
 {: #figverifyset title="Example: Verification SET"}
 
+Security Considerations {#SecCon}
+=======================
+
+Subject Probing
+---------------
+It may be possible for an Event Transmitter to leak information about subjects
+through their responses to add subject requests. A 404 response may indicate
+to the Event Receiver that the subject does not exist, which may inadvertantly
+reveal information about the subject (e.g. that a particular individual does
+or does not use the Event Transmitter's service).
+
+Event Transmitters SHOULD carefully evaluate the conditions under which they
+will return error responses to add subject requests. Event Transmitters MAY
+return a 204 response even if they will not actually send any events related
+to the subject, and Event Receivers MUST NOT assume that a 204 response means
+that they will receive events related to the subject.
+
+Information Harvesting
+----------------------
+SETs may contain personally identifiable information (PII) or other non-public
+information about the event transmitter, the subject (of an event in the SET),
+or the relationship between the two. It is important for Event Transmitters to
+understand what information they are revealing to Event Receivers when
+transmitting events to them, lest the event stream become a vector for 
+unauthorized access to private information.
+
+Event Transmitters SHOULD interpret add subject requests as statements of
+interest in a subject by an Event Receiver, and ARE NOT obligated to transmit
+events related to every subject an Event Receiver adds to the stream. Event
+Transmitters MAY choose to transmit some, all, or no events related to any
+given subject and SHOULD validate that they are permitted to share the
+information contained within an event with the Event Receiver before
+transmitting the event. The mechanisms by which such validation is performed
+are outside the scope of this specification.
+
+Malicous Subject Removal
+------------------------
+A malicious party may find it advantageous to remove a particular subject from
+a stream, in order to reduce the Event Receiver's ability to detect
+malicious activity related to the subject, inconvenience the subject, or for
+other reasons. Consequently it may be in the best interests of the subject for
+the Event Transmitter to continue to send events related to the subject for
+some time after the subject has been removed from a stream.
+
+Event Transmitters MAY continue sending events related to a subject for some
+amount of time after that subject has been removed from the stream. Event
+Receivers MUST tolerate receiving events for subjects that have been removed
+from the stream, and MUST NOT report these events as errors to the Event
+Transmitter.
+
 --- back
 
