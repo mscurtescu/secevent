@@ -449,9 +449,9 @@ the Event Receiver as a result of the above request:
   "iat": "1493856000",
   "events": [
     "urn:ietf:params:secevent:event-type:core:verification" : {
-      "state": "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo=",
-    },
-  ],
+      "state": "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo="
+    }
+  ]
 }
 ~~~
 {: #figverifyset title="Example: Verification SET"}
