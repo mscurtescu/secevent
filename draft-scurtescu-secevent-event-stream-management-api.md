@@ -353,7 +353,8 @@ the Event Transmitter has transmitted the event or will do so at some point
 in the future. Event Transmitters MAY transmit the event via an asynchronous
 process, and SHOULD publish an SLA for verification event transmission
 times. Event Receivers MUST NOT depend on the verification event being
-transmitted synchronously with their request.
+transmitted synchronously or in any particular order relative to the current
+queue of events.
 
 Errors are signaled with HTTP staus codes as follows:
 
