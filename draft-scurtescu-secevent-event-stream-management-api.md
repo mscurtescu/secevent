@@ -250,8 +250,8 @@ response, the Event Transmitter responds with an empty 200 OK response.
 The Event Transmitter MAY choose to silently ignore the request, for example
 if the subject has previously indicated to the transmitter that they do not
 want events to be transmitted to the Event Receiver. In this case, the
-transmitter MUST return an empty 200 OK response, and MUST NOT indicate to
-the receiver that the request was ignored.
+transmitter MAY return an empty 200 OK response or an appropriate error code
+(See [Security Considerations](#SecCon)).
 
 Errors are signaled with HTTP staus codes as follows:
 
