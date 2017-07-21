@@ -137,6 +137,7 @@ following properties:
 aud
 : A string containing an audience claim as defined in [JSON Web Token
   (JWT)](#RFC7519) that identifies the Event Receiver for the Event Stream.
+  This property cannot be updated.
 
 events
 : OPTIONAL. An array of URIs identifying the set of events which MAY be
@@ -213,7 +214,7 @@ GET /set/stream HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 ~~~
-{: #figconfigreq title="Example: Read Stream Configuration Request"}
+{: #figreadconfigreq title="Example: Read Stream Configuration Request"}
 
 The following is a non-normative example response:
 
@@ -229,6 +230,7 @@ Pragma: no-cache
     "delivery_method": "urn:example:secevent:delivery:http_post",
     "url": "https://receiver.example.com/events"
   },
+  "status": "enabled",
   "events": [
     "urn:example:secevent:events:type_1",
     "urn:example:secevent:events:type_2",
@@ -236,7 +238,90 @@ Pragma: no-cache
   ]
 }
 ~~~
-{: #figconfigresp title="Example: Read Stream Configuration Response"}
+{: #figreadconfigresp title="Example: Read Stream Configuration Response"}
+
+Errors are signaled with HTTP staus codes as follows:
+
+| Code | Description |
+|------+-------------|
+| 401  | if authorization failed or it is missing |
+| 403  | if the Event Receiver is not allowed to read the stream configuration |
+| 404  | if there is no Event Stream configured for this Event Receiver |
+| 429  | if the Event Receiver is sending too many requests in a gvien amount of time |
+{: #tabreadconfig title="Read Stream Configuration Errors"}
+
+### Updating a Stream's Configuration
+An Event Receiver updates the current configuration of a stream by making an
+HTTP POST request to the Configuration Endpoint. On receiving a valid request
+the Event Transmitter responds with a 200 OK response containing a {{!JSON}}
+representation of the updated stream configuration in the body.
+
+The full set of properties must be present in the POST body, not only the ones
+that are specifically intended to be changed. Missing properties SHOULD be 
+interpreted as requested to be deleted. Event Receivers should read the
+configuration first, update the {{!JSON}} representation then make an update
+request.
+
+Properties that cannot be updated can be present, but they MUST much the
+expected value.
+
+The following is a non-normative example request to read an Event Stream's
+configuration:
+
+~~~
+POST /set/stream HTTP/1.1
+Host: transmitter.example.com
+Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
+
+{
+  "aud": "http://www.example.com",
+  "delivery": {
+    "delivery_method": "urn:example:secevent:delivery:http_post",
+    "url": "https://receiver.example.com/events"
+  },
+  "status": "paused",
+  "events": [
+    "urn:example:secevent:events:type_1",
+    "urn:example:secevent:events:type_2",
+    "urn:example:secevent:events:type_3"
+  ]
+}
+~~~
+{: #figupdateconfigreq title="Example: Update Stream Configuration Request"}
+
+The following is a non-normative example response:
+
+~~~
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  "aud": "http://www.example.com",
+  "delivery": {
+    "delivery_method": "urn:example:secevent:delivery:http_post",
+    "url": "https://receiver.example.com/events"
+  },
+  "status": "paused",
+  "events": [
+    "urn:example:secevent:events:type_1",
+    "urn:example:secevent:events:type_2",
+    "urn:example:secevent:events:type_3"
+  ]
+}
+~~~
+{: #figupdateconfigresp title="Example: Update Stream Configuration Response"}
+
+Errors are signaled with HTTP staus codes as follows:
+
+| Code | Description |
+|------+-------------|
+| 400  | if the request body cannot be parsed or if the request is otherwise invalid |
+| 401  | if authorization failed or it is missing |
+| 403  | if the Event Receiver is not allowed to update the stream configuration |
+| 429  | if the Event Receiver is sending too many requests in a gvien amount of time |
+{: #tabupdateconfig title="Update Stream Configuration Errors"}
 
 Subjects {#subjects}
 --------------------
@@ -263,7 +348,7 @@ Errors are signaled with HTTP staus codes as follows:
 | 400  | if the request body cannot be parsed or if the request is otherwise invalid |
 | 401  | if authorization failed or it is missing |
 | 403  | if the Event Receiver is not allowed to add this particular subject |
-| 404  | if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and responde with 200 |
+| 404  | if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and respond with 200 |
 | 429  | if the Event Receiver is sending too many requests in a gvien amount of time |
 {: #tabadderr title="Add Subject Errors"}
 
@@ -304,7 +389,7 @@ Errors are signaled with HTTP staus codes as follows:
 | 400  | if the request body cannot be parsed or if the request is otherwise invalid |
 | 401  | if authorization failed or it is missing |
 | 403  | if the Event Receiver is not allowed to remove this particular subject |
-| 404  | if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and responde with 204 |
+| 404  | if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and respond with 204 |
 | 429  | if the Event Receiver is sending too many requests in a gvien amount of time |
 {: #tabremoveerr title="Remove Subject Errors"}
 

@@ -70,18 +70,19 @@ Table of Contents
      4.1.  Stream Configuration  . . . . . . . . . . . . . . . . . .   4
        4.1.1.  Checking a Stream's Status  . . . . . . . . . . . . .   5
        4.1.2.  Reading a Stream's Configuration  . . . . . . . . . .   6
-     4.2.  Subjects  . . . . . . . . . . . . . . . . . . . . . . . .   6
-       4.2.1.  Adding a Subject to a Stream  . . . . . . . . . . . .   7
-       4.2.2.  Removing a Subject  . . . . . . . . . . . . . . . . .   8
-     4.3.  Verification  . . . . . . . . . . . . . . . . . . . . . .  10
-       4.3.1.  Verification Event  . . . . . . . . . . . . . . . . .  10
-       4.3.2.  Triggering a Verification Event.  . . . . . . . . . .  10
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
-     5.1.  Subject Probing . . . . . . . . . . . . . . . . . . . . .  12
-     5.2.  Information Harvesting  . . . . . . . . . . . . . . . . .  13
-     5.3.  Malicious Subject Removal . . . . . . . . . . . . . . . .  13
-   6.  Normative References  . . . . . . . . . . . . . . . . . . . .  13
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
+       4.1.3.  Updating a Stream's Configuration . . . . . . . . . .   7
+     4.2.  Subjects  . . . . . . . . . . . . . . . . . . . . . . . .   9
+       4.2.1.  Adding a Subject to a Stream  . . . . . . . . . . . .   9
+       4.2.2.  Removing a Subject  . . . . . . . . . . . . . . . . .  11
+     4.3.  Verification  . . . . . . . . . . . . . . . . . . . . . .  12
+       4.3.1.  Verification Event  . . . . . . . . . . . . . . . . .  12
+       4.3.2.  Triggering a Verification Event.  . . . . . . . . . .  13
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
+     5.1.  Subject Probing . . . . . . . . . . . . . . . . . . . . .  14
+     5.2.  Information Harvesting  . . . . . . . . . . . . . . . . .  15
+     5.3.  Malicious Subject Removal . . . . . . . . . . . . . . . .  15
+   6.  Normative References  . . . . . . . . . . . . . . . . . . . .  15
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
 
@@ -89,7 +90,6 @@ Table of Contents
    Transmitters and that can be used by Event Receivers to query the
    Event Stream status, to add and remove subjects and to trigger
    verification.
-
 
 
 
@@ -203,7 +203,7 @@ Internet-Draft         event-stream-management-api             June 2017
    aud
       A string containing an audience claim as defined in JSON Web Token
       (JWT) [RFC7519] that identifies the Event Receiver for the Event
-      Stream.
+      Stream.  This property cannot be updated.
 
    events
       OPTIONAL.  An array of URIs identifying the set of events which
@@ -312,6 +312,7 @@ Internet-Draft         event-stream-management-api             June 2017
        "delivery_method": "urn:example:secevent:delivery:http_post",
        "url": "https://receiver.example.com/events"
      },
+     "status": "enabled",
      "events": [
        "urn:example:secevent:events:type_1",
        "urn:example:secevent:events:type_2",
@@ -321,12 +322,11 @@ Internet-Draft         event-stream-management-api             June 2017
 
            Figure 5: Example: Read Stream Configuration Response
 
-4.2.  Subjects
+   Errors are signaled with HTTP staus codes as follows:
 
-   An Event Receiver can indicate to an Event Transmitter whether or not
-   the receiver wants to receive events about a particular subject by
-   "adding" or "removing" that subject to the Event Stream,
-   respectively.
+
+
+
 
 
 
@@ -338,46 +338,46 @@ Scurtescu & Backman     Expires December 31, 2017               [Page 6]
 Internet-Draft         event-stream-management-api             June 2017
 
 
-4.2.1.  Adding a Subject to a Stream
-
-   To add a subject to an Event Stream, the Event Receiver makes an HTTP
-   POST request to the Add Subject Endpoint, containing in the body a
-   Subject Identifier Object identifying the subject to be added.  On a
-   successful response, the Event Transmitter responds with an empty 200
-   OK response.
-
-   The Event Transmitter MAY choose to silently ignore the request, for
-   example if the subject has previously indicated to the transmitter
-   that they do not want events to be transmitted to the Event Receiver.
-   In this case, the transmitter MUST return an empty 200 OK response,
-   and MUST NOT indicate to the receiver that the request was ignored.
-
-   Errors are signaled with HTTP staus codes as follows:
-
    +------+------------------------------------------------------------+
    | Code | Description                                                |
    +------+------------------------------------------------------------+
-   | 400  | if the request body cannot be parsed or if the request is  |
-   |      | otherwise invalid                                          |
-   |      |                                                            |
    | 401  | if authorization failed or it is missing                   |
    |      |                                                            |
-   | 403  | if the Event Receiver is not allowed to add this           |
-   |      | particular subject                                         |
+   | 403  | if the Event Receiver is not allowed to read the stream    |
+   |      | configuration                                              |
    |      |                                                            |
-   | 404  | if the subject is not recognized by the Event Transmitter, |
-   |      | the Event Transmitter may chose to stay silent in this     |
-   |      | case and responde with 200                                 |
+   | 404  | if there is no Event Stream configured for this Event      |
+   |      | Receiver                                                   |
    |      |                                                            |
    | 429  | if the Event Receiver is sending too many requests in a    |
    |      | gvien amount of time                                       |
    +------+------------------------------------------------------------+
 
-                        Table 1: Add Subject Errors
+                 Table 1: Read Stream Configuration Errors
 
-   The following is a non-normative example request to add a subject to
-   a stream, where the subject is identified by an OpenID Connect email
-   claim:
+4.1.3.  Updating a Stream's Configuration
+
+   An Event Receiver updates the current configuration of a stream by
+   making an HTTP POST request to the Configuration Endpoint.  On
+   receiving a valid request the Event Transmitter responds with a 200
+   OK response containing a [JSON] representation of the updated stream
+   configuration in the body.
+
+   The full set of properties must be present in the POST body, not only
+   the ones that are specifically intended to be changed.  Missing
+   properties SHOULD be interpreted as requested to be deleted.  Event
+   Receivers should read the configuration first, update the [JSON]
+   representation then make an update request.
+
+   Properties that cannot be updated can be present, but they MUST much
+   the expected value.
+
+   The following is a non-normative example request to read an Event
+   Stream's configuration:
+
+
+
+
 
 
 
@@ -394,50 +394,50 @@ Scurtescu & Backman     Expires December 31, 2017               [Page 7]
 Internet-Draft         event-stream-management-api             June 2017
 
 
-   POST /set/subjects:add HTTP/1.1
+   POST /set/stream HTTP/1.1
    Host: transmitter.example.com
    Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
    {
-     "email": "example.user@example.com"
+     "aud": "http://www.example.com",
+     "delivery": {
+       "delivery_method": "urn:example:secevent:delivery:http_post",
+       "url": "https://receiver.example.com/events"
+     },
+     "status": "paused",
+     "events": [
+       "urn:example:secevent:events:type_1",
+       "urn:example:secevent:events:type_2",
+       "urn:example:secevent:events:type_3"
+     ]
    }
 
-                  Figure 6: Example: Add Subject Request
+          Figure 6: Example: Update Stream Configuration Request
 
-   The following is a non-normative example response to a successful
-   request:
+   The following is a non-normative example response:
 
    HTTP/1.1 200 OK
-   Server: transmitter.example.com
+   Content-Type: application/json; charset=UTF-8
    Cache-Control: no-store
    Pragma: no-cache
 
-                  Figure 7: Example: Add Subject Response
+   {
+     "aud": "http://www.example.com",
+     "delivery": {
+       "delivery_method": "urn:example:secevent:delivery:http_post",
+       "url": "https://receiver.example.com/events"
+     },
+     "status": "paused",
+     "events": [
+       "urn:example:secevent:events:type_1",
+       "urn:example:secevent:events:type_2",
+       "urn:example:secevent:events:type_3"
+     ]
+   }
 
-4.2.2.  Removing a Subject
-
-   To remove a subject from an Event Stream, the Event Receiver makes an
-   HTTP POST request to the Remove Subject Endpoint, containing in the
-   body a Subject Identifier Object identifying the subject to be
-   removed.  On a successful response, the Event Transmitter responds
-   with a 204 No Content response.
+          Figure 7: Example: Update Stream Configuration Response
 
    Errors are signaled with HTTP staus codes as follows:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -458,41 +458,41 @@ Internet-Draft         event-stream-management-api             June 2017
    |      |                                                            |
    | 401  | if authorization failed or it is missing                   |
    |      |                                                            |
-   | 403  | if the Event Receiver is not allowed to remove this        |
-   |      | particular subject                                         |
-   |      |                                                            |
-   | 404  | if the subject is not recognized by the Event Transmitter, |
-   |      | the Event Transmitter may chose to stay silent in this     |
-   |      | case and responde with 204                                 |
+   | 403  | if the Event Receiver is not allowed to update the stream  |
+   |      | configuration                                              |
    |      |                                                            |
    | 429  | if the Event Receiver is sending too many requests in a    |
    |      | gvien amount of time                                       |
    +------+------------------------------------------------------------+
 
-                      Table 2: Remove Subject Errors
+                Table 2: Update Stream Configuration Errors
 
-   The following is a non-normative example request where the subject is
-   identified by a phone_number claim:
+4.2.  Subjects
 
-   POST /set/subjects:remove HTTP/1.1
-   Host: transmitter.example.com
-   Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
+   An Event Receiver can indicate to an Event Transmitter whether or not
+   the receiver wants to receive events about a particular subject by
+   "adding" or "removing" that subject to the Event Stream,
+   respectively.
 
-   {
-     "phone_number": "+1 206 555 0123"
-   }
+4.2.1.  Adding a Subject to a Stream
 
-                 Figure 8: Example: Remove Subject Request
+   To add a subject to an Event Stream, the Event Receiver makes an HTTP
+   POST request to the Add Subject Endpoint, containing in the body a
+   Subject Identifier Object identifying the subject to be added.  On a
+   successful response, the Event Transmitter responds with an empty 200
+   OK response.
 
-   The following is a non-normative example response to a successful
-   request:
+   The Event Transmitter MAY choose to silently ignore the request, for
+   example if the subject has previously indicated to the transmitter
+   that they do not want events to be transmitted to the Event Receiver.
+   In this case, the transmitter MUST return an empty 200 OK response,
+   and MUST NOT indicate to the receiver that the request was ignored.
 
-   HTTP/1.1 204 No Content
-   Server: transmitter.example.com
-   Cache-Control: no-store
-   Pragma: no-cache
+   Errors are signaled with HTTP staus codes as follows:
 
-                Figure 9: Example: Remove Subject Response
+
+
+
 
 
 
@@ -505,6 +505,125 @@ Scurtescu & Backman     Expires December 31, 2017               [Page 9]
 
 Internet-Draft         event-stream-management-api             June 2017
 
+
+   +------+------------------------------------------------------------+
+   | Code | Description                                                |
+   +------+------------------------------------------------------------+
+   | 400  | if the request body cannot be parsed or if the request is  |
+   |      | otherwise invalid                                          |
+   |      |                                                            |
+   | 401  | if authorization failed or it is missing                   |
+   |      |                                                            |
+   | 403  | if the Event Receiver is not allowed to add this           |
+   |      | particular subject                                         |
+   |      |                                                            |
+   | 404  | if the subject is not recognized by the Event Transmitter, |
+   |      | the Event Transmitter may chose to stay silent in this     |
+   |      | case and respond with 200                                  |
+   |      |                                                            |
+   | 429  | if the Event Receiver is sending too many requests in a    |
+   |      | gvien amount of time                                       |
+   +------+------------------------------------------------------------+
+
+                        Table 3: Add Subject Errors
+
+   The following is a non-normative example request to add a subject to
+   a stream, where the subject is identified by an OpenID Connect email
+   claim:
+
+   POST /set/subjects:add HTTP/1.1
+   Host: transmitter.example.com
+   Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
+
+   {
+     "email": "example.user@example.com"
+   }
+
+                  Figure 8: Example: Add Subject Request
+
+   The following is a non-normative example response to a successful
+   request:
+
+   HTTP/1.1 200 OK
+   Server: transmitter.example.com
+   Cache-Control: no-store
+   Pragma: no-cache
+
+                  Figure 9: Example: Add Subject Response
+
+
+
+
+
+
+
+Scurtescu & Backman     Expires December 31, 2017              [Page 10]
+
+Internet-Draft         event-stream-management-api             June 2017
+
+
+4.2.2.  Removing a Subject
+
+   To remove a subject from an Event Stream, the Event Receiver makes an
+   HTTP POST request to the Remove Subject Endpoint, containing in the
+   body a Subject Identifier Object identifying the subject to be
+   removed.  On a successful response, the Event Transmitter responds
+   with a 204 No Content response.
+
+   Errors are signaled with HTTP staus codes as follows:
+
+   +------+------------------------------------------------------------+
+   | Code | Description                                                |
+   +------+------------------------------------------------------------+
+   | 400  | if the request body cannot be parsed or if the request is  |
+   |      | otherwise invalid                                          |
+   |      |                                                            |
+   | 401  | if authorization failed or it is missing                   |
+   |      |                                                            |
+   | 403  | if the Event Receiver is not allowed to remove this        |
+   |      | particular subject                                         |
+   |      |                                                            |
+   | 404  | if the subject is not recognized by the Event Transmitter, |
+   |      | the Event Transmitter may chose to stay silent in this     |
+   |      | case and respond with 204                                  |
+   |      |                                                            |
+   | 429  | if the Event Receiver is sending too many requests in a    |
+   |      | gvien amount of time                                       |
+   +------+------------------------------------------------------------+
+
+                      Table 4: Remove Subject Errors
+
+   The following is a non-normative example request where the subject is
+   identified by a phone_number claim:
+
+   POST /set/subjects:remove HTTP/1.1
+   Host: transmitter.example.com
+   Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
+
+   {
+     "phone_number": "+1 206 555 0123"
+   }
+
+                Figure 10: Example: Remove Subject Request
+
+   The following is a non-normative example response to a successful
+   request:
+
+
+
+
+
+Scurtescu & Backman     Expires December 31, 2017              [Page 11]
+
+Internet-Draft         event-stream-management-api             June 2017
+
+
+   HTTP/1.1 204 No Content
+   Server: transmitter.example.com
+   Cache-Control: no-store
+   Pragma: no-cache
+
+                Figure 11: Example: Remove Subject Response
 
 4.3.  Verification
 
@@ -546,6 +665,15 @@ Internet-Draft         event-stream-management-api             June 2017
    Stream that fails to successfully verify based on the acknowledgement
    or lack of acknowledgement by the Event Receiver.
 
+
+
+
+
+Scurtescu & Backman     Expires December 31, 2017              [Page 12]
+
+Internet-Draft         event-stream-management-api             June 2017
+
+
 4.3.2.  Triggering a Verification Event.
 
    To request that a verification event be sent over an Event Stream,
@@ -553,14 +681,6 @@ Internet-Draft         event-stream-management-api             June 2017
    Endpoint, with a JSON object containing the parameters of the
    verification request, if any.  On a successful request, the event
    transmitter responds with an empty 204 No Content response.
-
-
-
-
-Scurtescu & Backman     Expires December 31, 2017              [Page 10]
-
-Internet-Draft         event-stream-management-api             June 2017
-
 
    Verification requests have the following properties:
 
@@ -596,7 +716,7 @@ Internet-Draft         event-stream-management-api             June 2017
    |      | gvien amount of time                                       |
    +------+------------------------------------------------------------+
 
-                       Table 3: Verification Errors
+                       Table 5: Verification Errors
 
    The following is a non-normative example request to trigger a
    verification event:
@@ -605,15 +725,7 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-
-
-
-
-
-
-
-
-Scurtescu & Backman     Expires December 31, 2017              [Page 11]
+Scurtescu & Backman     Expires December 31, 2017              [Page 13]
 
 Internet-Draft         event-stream-management-api             June 2017
 
@@ -627,7 +739,7 @@ Internet-Draft         event-stream-management-api             June 2017
      "state": "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo="
    }
 
-             Figure 10: Example: Trigger Verification Request
+             Figure 12: Example: Trigger Verification Request
 
    The following is a non-normative example response to a successful
    request:
@@ -637,7 +749,7 @@ Internet-Draft         event-stream-management-api             June 2017
    Cache-Control: no-store
    Pragma: no-cache
 
-             Figure 11: Example: Trigger Verification Response
+             Figure 13: Example: Trigger Verification Response
 
    And the following is a non-normative example of a verification event
    sent to the Event Receiver as a result of the above request:
@@ -654,7 +766,7 @@ Internet-Draft         event-stream-management-api             June 2017
      ],
    }
 
-                   Figure 12: Example: Verification SET
+                   Figure 14: Example: Verification SET
 
 5.  Security Considerations
 
@@ -669,7 +781,7 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 12]
+Scurtescu & Backman     Expires December 31, 2017              [Page 14]
 
 Internet-Draft         event-stream-management-api             June 2017
 
@@ -725,7 +837,7 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 13]
+Scurtescu & Backman     Expires December 31, 2017              [Page 15]
 
 Internet-Draft         event-stream-management-api             June 2017
 
@@ -781,4 +893,4 @@ Authors' Addresses
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 14]
+Scurtescu & Backman     Expires December 31, 2017              [Page 16]

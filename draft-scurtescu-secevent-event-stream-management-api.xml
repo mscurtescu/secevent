@@ -136,7 +136,8 @@ following properties:</t>
 <t><list style="hanging">
   <t hangText='aud'><vspace blankLines='0'/>
   A string containing an audience claim as defined in <xref target="RFC7519">JSON Web Token
-(JWT)</xref> that identifies the Event Receiver for the Event Stream.</t>
+(JWT)</xref> that identifies the Event Receiver for the Event Stream.
+This property cannot be updated.</t>
   <t hangText='events'><vspace blankLines='0'/>
   OPTIONAL. An array of URIs identifying the set of events which MAY be
 delivered over the Event Stream. If omitted, Event Transmitters SHOULD make
@@ -205,7 +206,7 @@ representation of the stream’s configuration in the body.</t>
 <t>The following is a non-normative example request to read an Event Stream’s
 configuration:</t>
 
-<figure title="Example: Read Stream Configuration Request" anchor="figconfigreq"><artwork><![CDATA[
+<figure title="Example: Read Stream Configuration Request" anchor="figreadconfigreq"><artwork><![CDATA[
 GET /set/stream HTTP/1.1
 Host: transmitter.example.com
 Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
@@ -213,7 +214,7 @@ Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
 
 <t>The following is a non-normative example response:</t>
 
-<figure title="Example: Read Stream Configuration Response" anchor="figconfigresp"><artwork><![CDATA[
+<figure title="Example: Read Stream Configuration Response" anchor="figreadconfigresp"><artwork><![CDATA[
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=UTF-8
 Cache-Control: no-store
@@ -225,6 +226,7 @@ Pragma: no-cache
     "delivery_method": "urn:example:secevent:delivery:http_post",
     "url": "https://receiver.example.com/events"
   },
+  "status": "enabled",
   "events": [
     "urn:example:secevent:events:type_1",
     "urn:example:secevent:events:type_2",
@@ -232,6 +234,98 @@ Pragma: no-cache
   ]
 }
 ]]></artwork></figure>
+
+<t>Errors are signaled with HTTP staus codes as follows:</t>
+
+<texttable title="Read Stream Configuration Errors" anchor="tabreadconfig">
+      <ttcol align='left'>Code</ttcol>
+      <ttcol align='left'>Description</ttcol>
+      <c>401</c>
+      <c>if authorization failed or it is missing</c>
+      <c>403</c>
+      <c>if the Event Receiver is not allowed to read the stream configuration</c>
+      <c>404</c>
+      <c>if there is no Event Stream configured for this Event Receiver</c>
+      <c>429</c>
+      <c>if the Event Receiver is sending too many requests in a gvien amount of time</c>
+</texttable>
+
+</section>
+<section anchor="updating-a-streams-configuration" title="Updating a Stream’s Configuration">
+<t>An Event Receiver updates the current configuration of a stream by making an
+HTTP POST request to the Configuration Endpoint. On receiving a valid request
+the Event Transmitter responds with a 200 OK response containing a <xref target="JSON"/>
+representation of the updated stream configuration in the body.</t>
+
+<t>The full set of properties must be present in the POST body, not only the ones
+that are specifically intended to be changed. Missing properties SHOULD be 
+interpreted as requested to be deleted. Event Receivers should read the
+configuration first, update the <xref target="JSON"/> representation then make an update
+request.</t>
+
+<t>Properties that cannot be updated can be present, but they MUST much the
+expected value.</t>
+
+<t>The following is a non-normative example request to read an Event Stream’s
+configuration:</t>
+
+<figure title="Example: Update Stream Configuration Request" anchor="figupdateconfigreq"><artwork><![CDATA[
+POST /set/stream HTTP/1.1
+Host: transmitter.example.com
+Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
+
+{
+  "aud": "http://www.example.com",
+  "delivery": {
+    "delivery_method": "urn:example:secevent:delivery:http_post",
+    "url": "https://receiver.example.com/events"
+  },
+  "status": "paused",
+  "events": [
+    "urn:example:secevent:events:type_1",
+    "urn:example:secevent:events:type_2",
+    "urn:example:secevent:events:type_3"
+  ]
+}
+]]></artwork></figure>
+
+<t>The following is a non-normative example response:</t>
+
+<figure title="Example: Update Stream Configuration Response" anchor="figupdateconfigresp"><artwork><![CDATA[
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  "aud": "http://www.example.com",
+  "delivery": {
+    "delivery_method": "urn:example:secevent:delivery:http_post",
+    "url": "https://receiver.example.com/events"
+  },
+  "status": "paused",
+  "events": [
+    "urn:example:secevent:events:type_1",
+    "urn:example:secevent:events:type_2",
+    "urn:example:secevent:events:type_3"
+  ]
+}
+]]></artwork></figure>
+
+<t>Errors are signaled with HTTP staus codes as follows:</t>
+
+<texttable title="Update Stream Configuration Errors" anchor="tabupdateconfig">
+      <ttcol align='left'>Code</ttcol>
+      <ttcol align='left'>Description</ttcol>
+      <c>400</c>
+      <c>if the request body cannot be parsed or if the request is otherwise invalid</c>
+      <c>401</c>
+      <c>if authorization failed or it is missing</c>
+      <c>403</c>
+      <c>if the Event Receiver is not allowed to update the stream configuration</c>
+      <c>429</c>
+      <c>if the Event Receiver is sending too many requests in a gvien amount of time</c>
+</texttable>
 
 </section>
 </section>
@@ -264,7 +358,7 @@ the receiver that the request was ignored.</t>
       <c>403</c>
       <c>if the Event Receiver is not allowed to add this particular subject</c>
       <c>404</c>
-      <c>if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and responde with 200</c>
+      <c>if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and respond with 200</c>
       <c>429</c>
       <c>if the Event Receiver is sending too many requests in a gvien amount of time</c>
 </texttable>
@@ -310,7 +404,7 @@ response, the Event Transmitter responds with a 204 No Content response.</t>
       <c>403</c>
       <c>if the Event Receiver is not allowed to remove this particular subject</c>
       <c>404</c>
-      <c>if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and responde with 204</c>
+      <c>if the subject is not recognized by the Event Transmitter, the Event Transmitter may chose to stay silent in this case and respond with 204</c>
       <c>429</c>
       <c>if the Event Receiver is sending too many requests in a gvien amount of time</c>
 </texttable>
@@ -594,127 +688,134 @@ Transmitter.</t>
   </back>
 
 <!-- ##markdown-source:
-H4sIALy9cFkAA+1cbXPbRpL+Pr9iTv4Qp0LqzS+75p6rotiOrZxteSXZ2Vwq
-lRoCQxIxiOFiAMmMrfz2e7pnBhiAoGQn51zt3akqFkXMS09P99OvyHg8FlVW
-5XoiX6hCzfVSF5U8enUsZ6aUZ0/O5ZML+uasKrVaWqGm01JfTKSmb8eWvx0v
-m5ljtcpEapJCLbFiWqoZBiV1WWn8O7Y6cfOumT3e3xepqjD7cP/gL+P9++PD
-ByLBF3NTricyK2ZGZKtyIquyttXh/v6D/UMhFFaayDONrbJqLS5N+XZemno1
-kWFP8Vav8XU6kcdFpctCV+PHRJ4QtlJF+rPKTYFN19qKVTaRP1YmGUlrStA4
-s/i0XtKHn7BVXS1MORFyLCR+ssKCdbvyLJySv3Xnf6HKrLa9R6acqyL7VVWZ
-KSbyqTHzXPMDvVRZPpHLhl9fz/nhbmKWnd2OduU3KnkLvkV7HRWFmuo8151n
-3c2OlupXU8SblVmyUJj5teJHbiv8iMKUS8y60Dio/O7s5OVEnn776C8H9x7g
-b/p07+ABPYKETHiGF6JwBV5szs1bXcjbGPWlG6XKua4mclFVKzvZ26uMye1u
-pqvZLkjdW1TLfM9JDX3XCkxF64z3D3iRW/L85PHJRL5ekaDIy6xaSNx/jn9m
-utRFoncx7vGT58dvnpz+0CUPAu1oeqxznK5cy9c2K+by2fn5q0EK51i9nhJj
-9rIi1SuNf4oqS/eO+Xe1HvNJ7d40N9O9pbIQLn+ERU1CHo6Q+g13q3fVRx9D
-jMdjqabQFJVAVLdzV4blMfufdVZq61QUfyaaHlhZGYhPmpEuCXx2j7FwYZdZ
-VfGIhZa2nv6ik8piV1NX8nIBCaEHaxBoF7SIX1HwAlANaI9cmMvBQfTlclee
-LzIr7Uon2Yz2hzCC3llWgEpVMO+lCJij5FTZLJGJKarS5HKVq4LWUdUQyQnm
-Z8tV7nALpIj+sZdqLWuriSiHNHzMWQ6KzcwtaeWsNEtpCh6Fx8Lgn9Kzf5ml
-KVRUHBM9aZ0w+e9vZfTnlXgY/YiPOCcdE5tMdUu2TuW0udLocII4ywenU2IG
-jhENPY1v9p813T2dLMZrCWyratxRZYRKU76qUi/NRXzPtAlOXWbzuS4lFmyI
-BwN+++038dU4+vlK9n66T8WH+NmHQMcjU8yyOX0RP8VgRy3//Pu49/NV/JQG
-+8Xcyr2fDw0//ODInDUzz5gdA2TQrcitZPQGd3bdIOO6wUe4gzPH+JsGf04y
-Tp0IBEr+p8h4E4naDYP/W8n4JHkmBXg/kbcgvqzxzpI83OmoWdd12rkS4hng
-xWMLfJOAztqpIOMs/JekqvGsRSEaWZgKMC1tYlaa8bACpogOpkAtX5qKP8Ja
-QLVoNv6wQCWg5kUXlDrwpOVbAmn4QVbuvHh9dr4zcr/lyxP+fPrk76+PT588
-ps9nz46eP28+uBECf5y8fu6f06d25qOTFy+evHzsJr84+mHH2Yadk1fnxycv
-j57v0MH4OPAQawfYpQ5oSF7ZqtSEhsqCYTYpsyn+wJz37/8NLsfhwcGDqysc
-/jFBahZODIDtHBg4LYF1/JyBTZdL62GYV/sR9vKn27fIao4GuEso60zhzOSw
-EuQd8BoTQYJwYVcqwf3v45aDAjlXYJYBe074GwFfi70madwIMmYKRGMtBZe0
-oksnc4P7XRrwIMlVtgw2VwVwZvCHr3C5gJmvFBn7ysA7gW2SdZEB8/O1zNzm
-a2cp/Mxgct1ObnXy1tyNTUkg8WXpeA3jopJEryo1hft4CXtJrkJYtjEUWAg8
-szBAWCkmvsM+6+hYlWaWYbWI2bi5bUrz/lYbBGyT3oeib/a8OW98j+BzxI7J
-NpdGOG9FkT9hejOlISsCrnTIhd1dqrfBV2Q3S9uKjK+AT7gyGc1kAe/Z4C44
-gAvn14+QuLieb9CuGfkH7O1AsGxm3e10ZbYhalNunTWuSyfvT/xAEtqimeac
-DeaNSjcO9QU8r7os6YskXgyn8zb2D67qHBcsF5vMG9YkD6e5a/q7e4NYrGf4
-bqSx6ymxk7i5aMeM3bgkS82WCw2eLRAgXtQLPktln2XEoWJgKcCv83pJ/hEg
-ytenzy0peyurZFyWdV5lEDXpYnE7ElDcC+i+dzyH6VxgHWuw6FJT+JjZJQYi
-3J4v4ngBTquIwElLtVrlOBKBTEf82esv1nIOFSwCi0ZS7853meccctM6nscJ
-cIv+VAgdJSlT2hgEUgNbg4KGMkvqBLW3IIVde2dZWV36zjpLb+SvBg15f8ux
-50r03RD6aS+gleLOdGxTapg26/SZELdjHDjyI9Ja5cUtrHRZZXpAe1Wdsn0B
-TTQ0Ni0A8jrNKHR0mO8saWv5eNfv9dRFjoDx2999f/4l8NlH9F+6W8+CPbOR
-ADTutXNKNsTQYScoC+Z+lzRAlSXsCbj9+vTYNkaFbSpJprNPHnad7JDkTrVo
-PaZhuZfHsKAsj+loIHYKpg6QjWg32EJ1obKcBdDFef2jXWTKCTbHfxAiLChv
-kyCKVT3NEdsS5Rl7aKbIwVcZXBm+arJxIRD/KB+Acjd7FyqvtVyprAzyuPYX
-2wqRWKkSY/lo4QIomdGE/Xi2MKnTBwXHEp5h7xnkUDQ325gV3hCDyS/cCTN+
-djN2GtGUjsapdtTjMiFaIhatkG6BMIWPxA2H47G8+hxEEIEu4Acz5oJ4G666
-kuyjLhTgmDwPsWHtmD5SFil76iIBeXTlKT5NmD1RAgEHzPMWd2P77510EDAi
-9wguM5Ps8gPSP4p0HXzoXwZRs1KE/dv3Jn//hv13+zPJJaS5C5OnjJx+Hla4
-NDW+Y0a1E1JSrVx7WpxjRAtgnWZrStR4R7PZGKfz1zLVCdQCMYPn5Q6fLc3s
-DZz9iNO15NBoLNU/FYl7riL7aC1jtZTi1q1b8tFCJ2+dWDb463yQFpgbBU9o
-sN0ieIDPWO4ijw+WjJ2+p9C4xoSbLqd6fs+uPCm8X+mIg4RmaZgthg0rbMTK
-FIjNWO+UPNzflyf/4b+GNe9ACKIigperKxHbEUALHuOyVQV9m9aVljvuiAjH
-LhfG6qCITqUzG+m3mYmB2/cua6tsGVmwwhTjJkss9TtFLmvMHeZ1n6lfWA8J
-E5dbIo7uAQz33OM9fxvE7b2D3QPE0baaxHK163fiVPUR5+Kb/PY3GiFNKfX6
-u/3pYZVPs+P7x8s3d3/4/uBy+vR1Nvu7eRjH824vUNzE9G7piZOpXtLo1J2M
-gvtP4Ia7OH/YcCp/r+SHV5QaPl+vsKl3j+goe79YU/wNHFQlePPw9fm347+K
-RwocHT9yadEJdhzbCuGXeFWq+VLxFwkNgcMA3QiXPml1VlwNnd6uPvL47ih0
-flK7UzjwPa3rOE0DyofItat6XTeJNPCTVG84jPkzFa9x65oTdNSn5wY6aJ2a
-dP07NYqDJtX3NkVnm2G9+nMUyhEypFAkLXLQt/5XUys42KRTVB6a7O1dXl7G
-/NsZ0ZDgBmDce670bPhVWKAui4mfOQk1okkYN6Hlf17hqnhFScPzsC1VpUJ5
-I958z9nLHUy4Yjr83xP5Y1hjYEs3aFKBVz8ftLvdMPLwo0feIXp+6kJPkJMB
-6LlOUFoAOgshOSIz//Gm2Kx1Aahi5OtgnSxBjAdwhDgCgOvBLgyuP7Cck0Z2
-IGsUknfw1BGq1rkqmzwe4GyHcpLFfAdLih3OLPBfcdKuG5Scee+I2ISH2Cgn
-3CDsPUoD9LYTAw6Lc5cIUfGqPcwYDcU+FCm1ZapXJ2fnooe3Q6mYUQyNEcK1
-xImN7OhmGNhSOtVEvU4ZxekMSaKtndW5CEofE38NhMPtWK6qdR/JO+m3fsIk
-WRjjKoUW7nJRUXZ1XlCKk7ZsEhPkkHqZF9mscwLKjMAkXGSmtjTby1kaWBg7
-yCHBskYMya4vZyO9MDlWxC78YMSK2Mil1CHWnjUi3oPDplJXUNOtLHEOeCgC
-xLoh3LG9gDQJoSAWlzis4w+FOk/K0pSuhmHxrcop7KCrYHmCt1GTQUw1Z6Ec
-zJMT+AFqnmr5QT7mjP+Kdf2D+ODrLx1tpjrPXRCP0Z7vgRQWOWg2KeuUAp2S
-Em64p944ygWRYl9mlkoOzjVwyx74ZVVsAuVMZblfiWdz9AGxdXPuRKT01Alj
-iRhF52zTk3xVAwDhlrsbLRee+HVwC2ZeZL9ekw/ephhUAE8WQbAr/OWkO1Rj
-WHR8aZhVyPcikJgwXYcPrj0m/B8fGnOFfd2mxjNS4flFhqBSLU1dcMqjypa4
-bjYFlZqSspdlMAMdhGF5+kS/oMGrTQgUIdwEtnuNjnjcTYxAVU5Wujh+TDao
-oCHcL+OSat7rIIT0LpY3QRPa9PM5Ws7/YELYq/erIaQvv459kK6tBU1DDlnM
-6T/igjnT08J0uIMtrtmZLiE129ny0c5Y/4QDrkT3iP3oxRngyEydNwn/Vm6G
-Mv43G08nGj3juaX08BnspzvFH7eguLO78qWR3p2OTej/Y/0NWO8l6V8L7u9+
-frh3fIkQv68Wvx/0h2C9l++Gb74whf65qJdTigSuR3N/h58b0GOSCNe/IrC8
-L+/duyf3Dw7v9ODcETUcYnc4+eeAegwQnwXcw3kHQ8XegVuI75Rk39+Ke9qG
-40REinCkufRD6mGdcs343EWybopUnRS0NMVGlwCn1YFKXAYAx0chjwVISbPZ
-jICg8hXPvnJxswqVI8ACGuuaQIFx1aWGTul3FAeSJOuFQoTBDQBDZBGOUWNR
-WrubFHgQVSlCUaHfTkGBcVufVhTKxoxzO4leVDJYnBs5KAzmqYwOyHSUS9fZ
-0ibLSCojEhNTYhLFXzXutCuJWGtVdepEXB8RKnlbmEsA+JwbKTib2C3NM4Uq
-tw0VthtURSgqXL9pkY4rM8avtrQDQqm7HGcbAfCSvGYwZCvI3VwdlnE/apGU
-65UvL2+t1ROqbiG44mII4eiIz0vQDMgQFH45W8F31jcVTYjoPJ7NlRkXBjZk
-gOCmeFWmXGRsqoAtijTVhYECtRfJ9UoLVxbyR8YXXDnMLPVkc+qIurwnXNq0
-vfTRmOZPIAh6ErN0x9cUdVRopjqzWSlwwZcxmh6GQYa0VS7tz8t1MG5/1anv
-nHIo6djaVlKyeN5KrXOjKPR9TUIap5w3uTroNbq+OnZgQkGXe37ZVaEQPINV
-dc1bHOi3nsQ1y21omOMJQQ7XBPQOH842eMKl9LgG1IxLjXYiBjuRLEaCMghk
-oFtDwYN19VhVaifqLnMZB7DuttWa3glgRhzu3qUK0/v3oUB8dUUlYhyM/QgP
-vAO1fFIQX2sk78zWdsXqEgTZYy/rLIEf63ULGoARFqE1dZYTZrlbbAGDO60E
-lxmTt4wc3UfXKta5k5xtF7/rAosbYJWYZpsmn+0Rh7gmXdePOAb7kkbBuacK
-htjsTKCJUauBh9kOwU0ejBzoYu3iDLHpLYwiXak+JlHXcSaiaOPNwO7W17g7
-oHRd10wfNHx3yjQDaYB1XxO9pumJE2QanjWkCFJSGUKNAQ+52OQY8+AL2yBG
-3/Ripbhfq9HDED6423DmE4aRiuHDUkQcxWJq8MJaPd+cSIhHHVSqNSNRc4DL
-VuqiTxCzxIdhQAGyb11b7VHChdFOSK8TzgZwRJuEDBcydFqAWOyLxBo/ov6c
-dQuCw01snfxqI6zGNy+kABFD9pf9QtfW5693VpOx390GVnFXhV+UWouoP8uu
-i2RRmsLUlnrtiGCXgPXo6fuMaOzZ8yOG7YGjx/6eINfAbvpzTUbXvbUUYG8Q
-fCD7osPKlkpw0bBYE0ZHsawpU1bm3MUQ/l59aVdA4uqotf3/Zs7gc0bSbNCi
-QLqrUH8odxpeBerCiHPrNsJlb1k/X5T8adXctvdBUzD95ulilay/of8W0+yb
-XD/9tkqevsuPn73c/+Efp/j9n4vpszf587l52Iu03cGGIm1v8bsY9r8k3g6n
-Hoi3txy7jbqPfL/9R52d47MBLGIvyJeeeirDjbMgjSJo75ioKaUAuuxiCfil
-yuj+Dw7v3L1335XloZlxCX0L19xYX+UfKrP7xVTF6999cOev9+7v7+/vbC25
-f3qMI0PjwO8WZVed5zaAn0ZDck39p/0L7lwsYhGutIc3Th/RiwZAfBXeu8GT
-R5RO2fa2RvN2zKvSTMm+bCRcKs5VEhwbgCY59528SKcz3shcq7f8+jdLEgXX
-XG8P6ToROtAhFlkbodjeiwENxsL/4xRso4NES/x+7IAANs5IWKwJkPS7jBxe
-18HsVlIppiCKrvI1nNkLerF3k/p4Me4zDiFCZGiJKISz3NGL/ShOafYNLuMG
-x6h5D/CQJbp972aoPzoBALsQSZPb6Vwu7ndK/RtWdZFyzBz6+gX7Rr6m3A0H
-r2H2sKMkQmmaoa25ipDlqNwbxb6P1HU1g1KXK2kbRJ1HnIZL85s7r2qrU6Ss
-rZc6sLuzPbd9i7Y87w/cafbwe8runhzNtnf8TAGgbTUg/EEH+IUqzti7EEwi
-frH0Wl/7YlfGYW8sOrdfHR9/SS6H61InfGWvMRHDArYRgo26che3vnr/ll+O
-E77P3Pl4YM0iWzXZSO5muDTcnO1eWDIs7azDA7cNSGdJ4sQSxIleM4ioZUaT
-b+hUxbda92+PMjetn8pvOTXtElgBkXIe3q7pdvJy+zIbnAQmkGkEOcGVoxwP
-215aZ1VmF5x7aam7VoOaFxcHJZ+MFkP4kuk0M8Hj2dcsokqjKzp3z+sk+Oj0
-CQuswQ3PG5nzhIhNcdScpgzrbmaZQWWT9+ykgsVGGNP2wzQBDYVCnN4dud6o
-AX2AZgr3Kk9LRBPeNKmtVr3o1iH2bZuLXShXyenIs9cQHzVkRSuzTXqyd9Kp
-npG705GXbtI4fk0IN+BAjt8f8nT613dAHhECjCHKoreJ5PVvE73AKgn1AkVV
-iqXB2lvwgDvWgAdhFlmBNePDDFaAQgxYFSiZmmt6XEUl64Eqo3t3qmmzp3dW
-OGbjaWmd6AGmfUF9bFlOFh/DUoT5SSVaghQ1otHDYfzjlDi/j+xeQuo8cnrn
-/tcK1MoKnINhIL+CqyzcbdW4BKEU7hTFaUyTjmoOaMotwb2rNODGXQmELca1
-yM1rcZzPYZaaVeElhaiza6r5/TQur4ekhg3vP21JBTRkhGhvQGFiIljDRC/q
-C+REvYLD9Gwqdc/0VSYnHy4UZSKCeO/m7UnaijNs8R6it0evc6zUZAPouW2b
-Iq3zEbqllhhq/P9lg5JqQvwXstEQXY9IAAA=
+H4sIAJjDcVkAA+1cbZPbNpL+jl+BG3+IU5HmLXZ2rT1XZWI79mRtj3dm7Fwu
+lUpBJCQxpggtQc5EGTu/fZ9uACRIUTN2cvZe7jJViSURL41GvzzdaHA8Hosq
+q3I9kc9UoeZ6qYtKHr04ljNTyrNH5/LRBf1yVpVaLa1Q02mpLyZS069jy7+O
+l03PsVplIjVJoZYYMS3VDI2Suqw0/j+2OnH9ruk93t8XqarQ+3D/4C/j/S/G
+h/dEgh/mplxPZFbMjMhW5URWZW2rw/39e/uHQiiMNJFnGlNl1VpcmvL1vDT1
+aiLDnOK1XuPndCKPi0qXha7GD4k8IWylivRHlZsCk661FatsIr+vTDKS1pSg
+cWbxab2kDz9gqrpamHIi5FhI/GWFBet25VlYJf/q1v9MlVlte49MOVdF9ouq
+MlNM5GNj5rnmB3qpsnwilw2/vpzzw93ELDuzHe3Kr1TyGnyL5joqCjXVea47
+z7qTHS3VL6aIJyuzZKHQ80vFj9xU+BOFKZfodaGxUPnN2cnziTz9+sFfDu7e
+w3f6dPfgHj2ChEy4hxeisAVebM7Na13I22j1qWulyrmuJnJRVSs72durjMnt
+bqar2S5I3VtUy3zPSQ391gpMReOM9w94kFvy/OThyUS+XJGgyMusWkjsf47/
+zXSpi0Tvot3DR0+PXz06/a5LHgTa0fRQ51hduZYvbVbM5ZPz8xeDFM4xej0l
+xuxlRapXGv8rqizdO+Z/q/WYV2r3prmZ7i2VhXD5JSxqEvKwhNRPuFv9XL3z
+MsR4PJZqCk1RCUR1O3dlGB69/1lnpbZORfE10fTAyspAfNKMdEngs3uMgQu7
+zKqKWyy0tPX0J51UFrOaupKXC0gIPViDQLugQfyIggeAakB75MJcDjaiH5e7
+8nyRWWlXOslmND+EEfTOsgJUqoJ5L0WwOUpOlc0SmZiiKk0uV7kqaBxVDZGc
+oH+2XOXOboEU0V/2Uq1lbTUR5SwNL3OWg2Izc0NaOSvNUpqCW+GxMPhf6dm/
+zNIUKiqOiZ60Tpj8q1sZfX0r7kd/4h3WScvEJFPdkq1TOW22NFqcIM7ywmmV
+6IFlRE1P4539Z017TyuL7bWEbatq7FFlhEpT3qpSL81FvM80CVZdZvO5LiUG
+bIgHA3799Vfx2Tj6+0z2/rpPxZv42ZtAxwNTzLI5/RA/RWNHLf/957j391n8
+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
+tA4jdI9aYlPjX3NHSTUh/gVyMnSZEFQAAA==
 
 -->
 
