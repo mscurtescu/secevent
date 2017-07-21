@@ -262,7 +262,7 @@ interpreted as requested to be deleted. Event Receivers should read the
 configuration first, update the {{!JSON}} representation then make an update
 request.
 
-Properties that cannot be updated can be present, but they MUST much the
+Properties that cannot be updated MAY be present, but they MUST match the
 expected value.
 
 The following is a non-normative example request to read an Event Stream's
