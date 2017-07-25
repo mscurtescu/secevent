@@ -154,8 +154,8 @@ min_verification_interval
 : An integer indicating the minimum amount of time in seconds that must pass
 in between verification requests. If an Event Receiver submits verification
 requests more frequently than this, the Event Transmitter MAY respond with a
-429 status code. An Event Transmitter MUST NOT respond with a 429 status code
-if an Event Receiver is not exceeding this frequency.
+429 status code. An Event Transmitter SHOULD NOT respond with a 429 status
+code if an Event Receiver is not exceeding this frequency.
 
 status
 : A string indicating the current status of the event stream. It MUST have one 

@@ -231,7 +231,7 @@ Internet-Draft         event-stream-management-api             June 2017
       must pass in between verification requests.  If an Event Receiver
       submits verification requests more frequently than this, the Event
       Transmitter MAY respond with a 429 status code.  An Event
-      Transmitter MUST NOT respond with a 429 status code if an Event
+      Transmitter SHOULD NOT respond with a 429 status code if an Event
       Receiver is not exceeding this frequency.
 
    status
