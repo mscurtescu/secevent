@@ -649,9 +649,9 @@ Internet-Draft         event-stream-management-api             June 2017
      "iat": "1493856000",
      "events": [
        "urn:ietf:params:secevent:event-type:core:verification" : {
-         "state": "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo="
-       }
-     ]
+         "state": "VGhpcyBpcyBhbiBleGFtcGxlIHN0YXRlIHZhbHVlLgo=",
+       },
+     ],
    }
 
                    Figure 12: Example: Verification SET
