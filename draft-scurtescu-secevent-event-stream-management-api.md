@@ -150,6 +150,13 @@ parameters for the SET delivery method. The actual delivery method is
 identified by the special key "delivery_method" with the value being a URI as
 defined in [DELIVERY](#DELIVERY).
 
+min_verification_interval
+: An integer indicating the minimum amount of time in seconds that must pass
+in between verification requests. If an Event Receiver submits verification
+requests more frequently than this, the Event Transmitter MAY respond with a
+429 status code. An Event Transmitter SHOULD NOT respond with a 429 status
+code if an Event Receiver is not exceeding this frequency.
+
 status
 : A string indicating the current status of the event stream. It MUST have one 
 of the following values:
@@ -233,7 +240,9 @@ Pragma: no-cache
     "urn:example:secevent:events:type_1",
     "urn:example:secevent:events:type_2",
     "urn:example:secevent:events:type_3"
-  ]
+  ],
+  "min_verification_interval": 60,
+  "status": "enabled"
 }
 ~~~
 {: #figconfigresp title="Example: Read Stream Configuration Response"}
@@ -253,8 +262,8 @@ response, the Event Transmitter responds with an empty 200 OK response.
 The Event Transmitter MAY choose to silently ignore the request, for example
 if the subject has previously indicated to the transmitter that they do not
 want events to be transmitted to the Event Receiver. In this case, the
-transmitter MUST return an empty 200 OK response, and MUST NOT indicate to
-the receiver that the request was ignored.
+transmitter MAY return an empty 200 OK response or an appropriate error code
+(See [Security Considerations](#SecCon)).
 
 Errors are signaled with HTTP staus codes as follows:
 
