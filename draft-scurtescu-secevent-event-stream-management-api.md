@@ -252,15 +252,16 @@ Errors are signaled with HTTP staus codes as follows:
 
 ### Updating a Stream's Configuration
 An Event Receiver updates the current configuration of a stream by making an
-HTTP POST request to the Configuration Endpoint. On receiving a valid request
-the Event Transmitter responds with a 200 OK response containing a {{!JSON}}
-representation of the updated stream configuration in the body.
+HTTP POST request to the Configuration Endpoint. The POST body contains a
+{{!JSON} representation of the updated configuration. On receiving a valid
+request the Event Transmitter responds with a 200 OK response containing a
+{{!JSON}} representation of the updated stream configuration in the body.
 
-The full set of properties must be present in the POST body, not only the ones
-that are specifically intended to be changed. Missing properties SHOULD be 
-interpreted as requested to be deleted. Event Receivers should read the
-configuration first, update the {{!JSON}} representation then make an update
-request.
+The full set of editable properties must be present in the POST body, not only
+the ones that are specifically intended to be changed. Missing properties
+SHOULD be interpreted as requested to be deleted. Event Receivers should read
+the configuration first, modify the {{!JSON}} representation, then make an
+update request.
 
 Properties that cannot be updated MAY be present, but they MUST match the
 expected value.
