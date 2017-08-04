@@ -247,7 +247,6 @@ Errors are signaled with HTTP staus codes as follows:
 | 401  | if authorization failed or it is missing |
 | 403  | if the Event Receiver is not allowed to read the stream configuration |
 | 404  | if there is no Event Stream configured for this Event Receiver |
-| 429  | if the Event Receiver is sending too many requests in a gvien amount of time |
 {: #tabreadconfig title="Read Stream Configuration Errors"}
 
 ### Updating a Stream's Configuration
@@ -321,7 +320,6 @@ Errors are signaled with HTTP staus codes as follows:
 | 400  | if the request body cannot be parsed or if the request is otherwise invalid |
 | 401  | if authorization failed or it is missing |
 | 403  | if the Event Receiver is not allowed to update the stream configuration |
-| 429  | if the Event Receiver is sending too many requests in a gvien amount of time |
 {: #tabupdateconfig title="Update Stream Configuration Errors"}
 
 Subjects {#subjects}
