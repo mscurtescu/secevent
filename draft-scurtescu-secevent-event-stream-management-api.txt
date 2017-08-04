@@ -72,17 +72,17 @@ Table of Contents
        4.1.2.  Reading a Stream's Configuration  . . . . . . . . . .   6
        4.1.3.  Updating a Stream's Configuration . . . . . . . . . .   7
      4.2.  Subjects  . . . . . . . . . . . . . . . . . . . . . . . .   9
-       4.2.1.  Adding a Subject to a Stream  . . . . . . . . . . . .   9
+       4.2.1.  Adding a Subject to a Stream  . . . . . . . . . . . .  10
        4.2.2.  Removing a Subject  . . . . . . . . . . . . . . . . .  11
-     4.3.  Verification  . . . . . . . . . . . . . . . . . . . . . .  12
-       4.3.1.  Verification Event  . . . . . . . . . . . . . . . . .  12
+     4.3.  Verification  . . . . . . . . . . . . . . . . . . . . . .  13
+       4.3.1.  Verification Event  . . . . . . . . . . . . . . . . .  13
        4.3.2.  Triggering a Verification Event.  . . . . . . . . . .  13
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
-     5.1.  Subject Probing . . . . . . . . . . . . . . . . . . . . .  14
-     5.2.  Information Harvesting  . . . . . . . . . . . . . . . . .  15
-     5.3.  Malicious Subject Removal . . . . . . . . . . . . . . . .  15
-   6.  Normative References  . . . . . . . . . . . . . . . . . . . .  15
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
+     5.1.  Subject Probing . . . . . . . . . . . . . . . . . . . . .  15
+     5.2.  Information Harvesting  . . . . . . . . . . . . . . . . .  16
+     5.3.  Malicious Subject Removal . . . . . . . . . . . . . . . .  16
+   6.  Normative References  . . . . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -226,6 +226,14 @@ Scurtescu & Backman     Expires February 5, 2018                [Page 4]
 Internet-Draft         event-stream-management-api           August 2017
 
 
+   min_verification_interval
+      An integer indicating the minimum amount of time in seconds that
+      must pass in between verification requests.  If an Event Receiver
+      submits verification requests more frequently than this, the Event
+      Transmitter MAY respond with a 429 status code.  An Event
+      Transmitter SHOULD NOT respond with a 429 status code if an Event
+      Receiver is not exceeding this frequency.
+
    status
       A string indicating the current status of the event stream.  It
       MUST have one of the following values:
@@ -263,6 +271,17 @@ Internet-Draft         event-stream-management-api           August 2017
 
    The following is a non-normative example response:
 
+
+
+
+
+
+
+Scurtescu & Backman     Expires February 5, 2018                [Page 5]
+
+Internet-Draft         event-stream-management-api           August 2017
+
+
    HTTP/1.1 200 OK
    Content-Type: application/json; charset=UTF-8
    Cache-Control: no-store
@@ -273,14 +292,6 @@ Internet-Draft         event-stream-management-api           August 2017
    }
 
               Figure 3: Example: Check Stream Status Response
-
-
-
-
-Scurtescu & Backman     Expires February 5, 2018                [Page 5]
-
-Internet-Draft         event-stream-management-api           August 2017
-
 
 4.1.2.  Reading a Stream's Configuration
 
@@ -301,6 +312,32 @@ Internet-Draft         event-stream-management-api           August 2017
 
    The following is a non-normative example response:
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Scurtescu & Backman     Expires February 5, 2018                [Page 6]
+
+Internet-Draft         event-stream-management-api           August 2017
+
+
    HTTP/1.1 200 OK
    Content-Type: application/json; charset=UTF-8
    Cache-Control: no-store
@@ -317,26 +354,14 @@ Internet-Draft         event-stream-management-api           August 2017
        "urn:example:secevent:events:type_1",
        "urn:example:secevent:events:type_2",
        "urn:example:secevent:events:type_3"
-     ]
+     ],
+     "min_verification_interval": 60,
+     "status": "enabled"
    }
 
            Figure 5: Example: Read Stream Configuration Response
 
    Errors are signaled with HTTP staus codes as follows:
-
-
-
-
-
-
-
-
-
-
-Scurtescu & Backman     Expires February 5, 2018                [Page 6]
-
-Internet-Draft         event-stream-management-api           August 2017
-
 
    +------+------------------------------------------------------------+
    | Code | Description                                                |
@@ -361,6 +386,14 @@ Internet-Draft         event-stream-management-api           August 2017
    200 OK response containing a [JSON] representation of the updated
    stream configuration in the body.
 
+
+
+
+Scurtescu & Backman     Expires February 5, 2018                [Page 7]
+
+Internet-Draft         event-stream-management-api           August 2017
+
+
    The full set of editable properties must be present in the POST body,
    not only the ones that are specifically intended to be changed.
    Missing properties SHOULD be interpreted as requested to be deleted.
@@ -372,27 +405,6 @@ Internet-Draft         event-stream-management-api           August 2017
 
    The following is a non-normative example request to read an Event
    Stream's configuration:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Scurtescu & Backman     Expires February 5, 2018                [Page 7]
-
-Internet-Draft         event-stream-management-api           August 2017
-
 
    POST /set/stream HTTP/1.1
    Host: transmitter.example.com
@@ -415,6 +427,28 @@ Internet-Draft         event-stream-management-api           August 2017
           Figure 6: Example: Update Stream Configuration Request
 
    The following is a non-normative example response:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Scurtescu & Backman     Expires February 5, 2018                [Page 8]
+
+Internet-Draft         event-stream-management-api           August 2017
+
 
    HTTP/1.1 200 OK
    Content-Type: application/json; charset=UTF-8
@@ -439,17 +473,6 @@ Internet-Draft         event-stream-management-api           August 2017
 
    Errors are signaled with HTTP staus codes as follows:
 
-
-
-
-
-
-
-Scurtescu & Backman     Expires February 5, 2018                [Page 8]
-
-Internet-Draft         event-stream-management-api           August 2017
-
-
    +------+------------------------------------------------------------+
    | Code | Description                                                |
    +------+------------------------------------------------------------+
@@ -471,29 +494,6 @@ Internet-Draft         event-stream-management-api           August 2017
    "adding" or "removing" that subject to the Event Stream,
    respectively.
 
-4.2.1.  Adding a Subject to a Stream
-
-   To add a subject to an Event Stream, the Event Receiver makes an HTTP
-   POST request to the Add Subject Endpoint, containing in the body a
-   Subject Identifier Object identifying the subject to be added.  On a
-   successful response, the Event Transmitter responds with an empty 200
-   OK response.
-
-   The Event Transmitter MAY choose to silently ignore the request, for
-   example if the subject has previously indicated to the transmitter
-   that they do not want events to be transmitted to the Event Receiver.
-   In this case, the transmitter MUST return an empty 200 OK response,
-   and MUST NOT indicate to the receiver that the request was ignored.
-
-   Errors are signaled with HTTP staus codes as follows:
-
-
-
-
-
-
-
-
 
 
 
@@ -505,6 +505,22 @@ Scurtescu & Backman     Expires February 5, 2018                [Page 9]
 
 Internet-Draft         event-stream-management-api           August 2017
 
+
+4.2.1.  Adding a Subject to a Stream
+
+   To add a subject to an Event Stream, the Event Receiver makes an HTTP
+   POST request to the Add Subject Endpoint, containing in the body a
+   Subject Identifier Object identifying the subject to be added.  On a
+   successful response, the Event Transmitter responds with an empty 200
+   OK response.
+
+   The Event Transmitter MAY choose to silently ignore the request, for
+   example if the subject has previously indicated to the transmitter
+   that they do not want events to be transmitted to the Event Receiver.
+   In this case, the transmitter MAY return an empty 200 OK response or
+   an appropriate error code (See Security Considerations (Section 5)).
+
+   Errors are signaled with HTTP staus codes as follows:
 
    +------+------------------------------------------------------------+
    | Code | Description                                                |
@@ -531,6 +547,21 @@ Internet-Draft         event-stream-management-api           August 2017
    a stream, where the subject is identified by an OpenID Connect email
    claim:
 
+
+
+
+
+
+
+
+
+
+
+Scurtescu & Backman     Expires February 5, 2018               [Page 10]
+
+Internet-Draft         event-stream-management-api           August 2017
+
+
    POST /set/subjects:add HTTP/1.1
    Host: transmitter.example.com
    Authorization: Bearer eyJ0b2tlbiI6ImV4YW1wbGUifQo=
@@ -551,17 +582,6 @@ Internet-Draft         event-stream-management-api           August 2017
 
                   Figure 9: Example: Add Subject Response
 
-
-
-
-
-
-
-Scurtescu & Backman     Expires February 5, 2018               [Page 10]
-
-Internet-Draft         event-stream-management-api           August 2017
-
-
 4.2.2.  Removing a Subject
 
    To remove a subject from an Event Stream, the Event Receiver makes an
@@ -571,6 +591,32 @@ Internet-Draft         event-stream-management-api           August 2017
    with a 204 No Content response.
 
    Errors are signaled with HTTP staus codes as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Scurtescu & Backman     Expires February 5, 2018               [Page 11]
+
+Internet-Draft         event-stream-management-api           August 2017
+
 
    +------+------------------------------------------------------------+
    | Code | Description                                                |
@@ -609,21 +655,24 @@ Internet-Draft         event-stream-management-api           August 2017
    The following is a non-normative example response to a successful
    request:
 
-
-
-
-
-Scurtescu & Backman     Expires February 5, 2018               [Page 11]
-
-Internet-Draft         event-stream-management-api           August 2017
-
-
    HTTP/1.1 204 No Content
    Server: transmitter.example.com
    Cache-Control: no-store
    Pragma: no-cache
 
                 Figure 11: Example: Remove Subject Response
+
+
+
+
+
+
+
+
+Scurtescu & Backman     Expires February 5, 2018               [Page 12]
+
+Internet-Draft         event-stream-management-api           August 2017
+
 
 4.3.  Verification
 
@@ -665,15 +714,6 @@ Internet-Draft         event-stream-management-api           August 2017
    Stream that fails to successfully verify based on the acknowledgement
    or lack of acknowledgement by the Event Receiver.
 
-
-
-
-
-Scurtescu & Backman     Expires February 5, 2018               [Page 12]
-
-Internet-Draft         event-stream-management-api           August 2017
-
-
 4.3.2.  Triggering a Verification Event.
 
    To request that a verification event be sent over an Event Stream,
@@ -681,6 +721,14 @@ Internet-Draft         event-stream-management-api           August 2017
    Endpoint, with a JSON object containing the parameters of the
    verification request, if any.  On a successful request, the event
    transmitter responds with an empty 204 No Content response.
+
+
+
+
+Scurtescu & Backman     Expires February 5, 2018               [Page 13]
+
+Internet-Draft         event-stream-management-api           August 2017
+
 
    Verification requests have the following properties:
 
@@ -725,7 +773,15 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 13]
+
+
+
+
+
+
+
+
+Scurtescu & Backman     Expires February 5, 2018               [Page 14]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -781,7 +837,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 14]
+Scurtescu & Backman     Expires February 5, 2018               [Page 15]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -837,7 +893,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 15]
+Scurtescu & Backman     Expires February 5, 2018               [Page 16]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -893,4 +949,4 @@ Authors' Addresses
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 16]
+Scurtescu & Backman     Expires February 5, 2018               [Page 17]
