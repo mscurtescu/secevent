@@ -5,8 +5,8 @@
 secevent                                                    M. Scurtescu
 Internet-Draft                                                    Google
 Intended status: Informational                                A. Backman
-Expires: December 31, 2017                                        Amazon
-                                                           June 29, 2017
+Expires: February 5, 2018                                         Amazon
+                                                         August 04, 2017
 
 
                   Management API for SET Event Streams
@@ -36,7 +36,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on December 31, 2017.
+   This Internet-Draft will expire on February 5, 2018.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Scurtescu & Backman     Expires December 31, 2017               [Page 1]
+Scurtescu & Backman     Expires February 5, 2018                [Page 1]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    the Trust Legal Provisions and are provided without warranty as
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Scurtescu & Backman     Expires December 31, 2017               [Page 2]
+Scurtescu & Backman     Expires February 5, 2018                [Page 2]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    +------------+                +------------+
@@ -165,9 +165,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017               [Page 3]
+Scurtescu & Backman     Expires February 5, 2018                [Page 3]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    The Event Stream Management API is implemented by the Event
@@ -221,9 +221,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017               [Page 4]
+Scurtescu & Backman     Expires February 5, 2018                [Page 4]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    status
@@ -277,9 +277,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017               [Page 5]
+Scurtescu & Backman     Expires February 5, 2018                [Page 5]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
 4.1.2.  Reading a Stream's Configuration
@@ -333,9 +333,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017               [Page 6]
+Scurtescu & Backman     Expires February 5, 2018                [Page 6]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    +------+------------------------------------------------------------+
@@ -348,9 +348,6 @@ Internet-Draft         event-stream-management-api             June 2017
    |      |                                                            |
    | 404  | if there is no Event Stream configured for this Event      |
    |      | Receiver                                                   |
-   |      |                                                            |
-   | 429  | if the Event Receiver is sending too many requests in a    |
-   |      | gvien amount of time                                       |
    +------+------------------------------------------------------------+
 
                  Table 1: Read Stream Configuration Errors
@@ -389,9 +386,12 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017               [Page 7]
+
+
+
+Scurtescu & Backman     Expires February 5, 2018                [Page 7]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    POST /set/stream HTTP/1.1
@@ -445,9 +445,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017               [Page 8]
+Scurtescu & Backman     Expires February 5, 2018                [Page 8]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    +------+------------------------------------------------------------+
@@ -460,9 +460,6 @@ Internet-Draft         event-stream-management-api             June 2017
    |      |                                                            |
    | 403  | if the Event Receiver is not allowed to update the stream  |
    |      | configuration                                              |
-   |      |                                                            |
-   | 429  | if the Event Receiver is sending too many requests in a    |
-   |      | gvien amount of time                                       |
    +------+------------------------------------------------------------+
 
                 Table 2: Update Stream Configuration Errors
@@ -501,9 +498,12 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017               [Page 9]
+
+
+
+Scurtescu & Backman     Expires February 5, 2018                [Page 9]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    +------+------------------------------------------------------------+
@@ -557,9 +557,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 10]
+Scurtescu & Backman     Expires February 5, 2018               [Page 10]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
 4.2.2.  Removing a Subject
@@ -613,9 +613,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 11]
+Scurtescu & Backman     Expires February 5, 2018               [Page 11]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    HTTP/1.1 204 No Content
@@ -669,9 +669,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 12]
+Scurtescu & Backman     Expires February 5, 2018               [Page 12]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
 4.3.2.  Triggering a Verification Event.
@@ -725,9 +725,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 13]
+Scurtescu & Backman     Expires February 5, 2018               [Page 13]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    POST /set/verify HTTP/1.1
@@ -781,9 +781,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 14]
+Scurtescu & Backman     Expires February 5, 2018               [Page 14]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    Event Transmitters SHOULD carefully evaluate the conditions under
@@ -837,9 +837,9 @@ Internet-Draft         event-stream-management-api             June 2017
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 15]
+Scurtescu & Backman     Expires February 5, 2018               [Page 15]
 
-Internet-Draft         event-stream-management-api             June 2017
+Internet-Draft         event-stream-management-api           August 2017
 
 
    [DELIVERY]
@@ -893,4 +893,4 @@ Authors' Addresses
 
 
 
-Scurtescu & Backman     Expires December 31, 2017              [Page 16]
+Scurtescu & Backman     Expires February 5, 2018               [Page 16]
