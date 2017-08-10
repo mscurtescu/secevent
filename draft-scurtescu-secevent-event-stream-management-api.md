@@ -2,7 +2,7 @@
 title: Management API for SET Event Streams
 abbrev: event-stream-management-api
 docname: draft-scurtescu-secevent-event-stream-management-api-00
-date: 2017-08-04
+date: 2017-08-10
 category: info
 ipr: trust200902
 

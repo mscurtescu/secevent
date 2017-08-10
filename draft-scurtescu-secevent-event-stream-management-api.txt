@@ -5,8 +5,8 @@
 secevent                                                    M. Scurtescu
 Internet-Draft                                                    Google
 Intended status: Informational                                A. Backman
-Expires: February 5, 2018                                         Amazon
-                                                         August 04, 2017
+Expires: February 11, 2018                                        Amazon
+                                                         August 10, 2017
 
 
                   Management API for SET Event Streams
@@ -36,7 +36,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on February 5, 2018.
+   This Internet-Draft will expire on February 11, 2018.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Scurtescu & Backman     Expires February 5, 2018                [Page 1]
+Scurtescu & Backman     Expires February 11, 2018               [Page 1]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Scurtescu & Backman     Expires February 5, 2018                [Page 2]
+Scurtescu & Backman     Expires February 11, 2018               [Page 2]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -165,7 +165,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018                [Page 3]
+Scurtescu & Backman     Expires February 11, 2018               [Page 3]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -221,7 +221,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018                [Page 4]
+Scurtescu & Backman     Expires February 11, 2018               [Page 4]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -277,7 +277,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018                [Page 5]
+Scurtescu & Backman     Expires February 11, 2018               [Page 5]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -333,7 +333,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018                [Page 6]
+Scurtescu & Backman     Expires February 11, 2018               [Page 6]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -356,7 +356,6 @@ Internet-Draft         event-stream-management-api           August 2017
        "urn:example:secevent:events:type_3"
      ],
      "min_verification_interval": 60,
-     "status": "enabled"
    }
 
            Figure 5: Example: Read Stream Configuration Response
@@ -389,7 +388,8 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018                [Page 7]
+
+Scurtescu & Backman     Expires February 11, 2018               [Page 7]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -445,7 +445,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018                [Page 8]
+Scurtescu & Backman     Expires February 11, 2018               [Page 8]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -501,7 +501,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018                [Page 9]
+Scurtescu & Backman     Expires February 11, 2018               [Page 9]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -557,7 +557,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 10]
+Scurtescu & Backman     Expires February 11, 2018              [Page 10]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -613,7 +613,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 11]
+Scurtescu & Backman     Expires February 11, 2018              [Page 11]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -669,7 +669,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 12]
+Scurtescu & Backman     Expires February 11, 2018              [Page 12]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -725,7 +725,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 13]
+Scurtescu & Backman     Expires February 11, 2018              [Page 13]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -781,7 +781,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 14]
+Scurtescu & Backman     Expires February 11, 2018              [Page 14]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -837,7 +837,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 15]
+Scurtescu & Backman     Expires February 11, 2018              [Page 15]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -893,7 +893,7 @@ Internet-Draft         event-stream-management-api           August 2017
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 16]
+Scurtescu & Backman     Expires February 11, 2018              [Page 16]
 
 Internet-Draft         event-stream-management-api           August 2017
 
@@ -949,4 +949,4 @@ Authors' Addresses
 
 
 
-Scurtescu & Backman     Expires February 5, 2018               [Page 17]
+Scurtescu & Backman     Expires February 11, 2018              [Page 17]
