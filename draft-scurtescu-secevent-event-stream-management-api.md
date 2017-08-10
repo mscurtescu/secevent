@@ -244,7 +244,6 @@ Pragma: no-cache
     "urn:example:secevent:events:type_3"
   ],
   "min_verification_interval": 60,
-  "status": "enabled"
 }
 ~~~
 {: #figreadconfigresp title="Example: Read Stream Configuration Response"}
