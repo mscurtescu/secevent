@@ -10,7 +10,7 @@ Expires: February 11, 2018                                        Amazon
 
 
                   Management API for SET Event Streams
-        draft-scurtescu-secevent-event-stream-management-api-00
+           draft-scurtescu-secevent-event-stream-mgmt-api-00
 
 Abstract
 
